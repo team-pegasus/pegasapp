@@ -1,58 +1,11 @@
 import React from "react";
-import { View, Text, Button, TextInput, ScrollView } from "react-native";
+import { View, Text } from "react-native";
 import { createBottomTabNavigator } from "react-navigation";
-import { MapView } from "expo";
-import SearchBar from "./SearchBar";
-import ClinicCard from "./ClinicCard";
 import Icon from "react-native-vector-icons/Ionicons";
+import Home from "./screens/Home";
 
 export interface Props {
   navigation: any;
-}
-
-class HomeScreen extends React.Component<Props> {
-  render() {
-    return (
-      <View style={{ flex: 1 }}>
-        <MapView
-          style={{ flex: 2 }}
-          initialRegion={{
-            latitude: 43.4723,
-            longitude: -80.5449,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421
-          }}
-        >
-          <SearchBar />
-        </MapView>
-        <View
-          style={{
-            flex: 1,
-            paddingTop: 20,
-            backgroundColor: "white",
-            shadowOffset: { width: 0, height: 0 },
-            shadowColor: "black",
-            shadowOpacity: 0.2,
-            elevation: 1
-          }}
-        >
-          <ScrollView style={{ flex: 1, paddingTop: 3 }}>
-            <ClinicCard etr={15} />
-            <ClinicCard
-              name="Spruce Medical"
-              address="318 Spruce St."
-              etr={30}
-            />
-            <ClinicCard
-              name="Waterloo Onyx"
-              address="280 Lester St."
-              etr={50}
-            />
-          </ScrollView>
-        </View>
-      </View>
-    );
-  }
 }
 
 class ScreenTwo extends React.Component {
@@ -68,23 +21,8 @@ class ScreenTwo extends React.Component {
 class ScreenThree extends React.Component {
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <View
-          style={{
-            flex: 2,
-            justifyContent: "flex-start",
-            alignItems: "center"
-          }}
-        >
-          <SearchBar />
-        </View>
-        <ScrollView
-          style={{ flex: 2, paddingTop: 20, backgroundColor: "white" }}
-        >
-          <ClinicCard />
-          <ClinicCard name="Spruce Medical" />
-          <ClinicCard name="Waterloo Onyx" />
-        </ScrollView>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Screen Three</Text>
       </View>
     );
   }
@@ -92,13 +30,12 @@ class ScreenThree extends React.Component {
 
 const RootStack = createBottomTabNavigator(
   {
-    // Home: HomeScreen,
     Home: {
-      screen: HomeScreen,
+      screen: Home,
       navigationOptions: {
-        tabBarLabel: "Home",
+        tabBarLabel: "Find",
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-home" color={tintColor} size={24} />
+          <Icon name="ios-search" color={tintColor} size={24} />
         )
       }
     },

@@ -1,8 +1,10 @@
 import React from "react";
-import { View, FlatList, Text } from "react-native";
+import { View, FlatList, Text, Button } from "react-native";
 import { MapView } from "expo";
 import SearchBar from "./components/SearchBar";
 import ClinicCard from "./components/ClinicCard";
+import { createStackNavigator } from "react-navigation";
+import ClinicDetail from "../ClinicDetail";
 
 const mockClinicData = [
   {
@@ -34,10 +36,10 @@ const mockClinicData = [
     address: "280 Lester St.",
     etr: 50,
     coords: {
-      latitude: 43.4723,
-      longitude: -80.5449,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421
+      latitude: 43.48,
+      longitude: -80.52,
+      latitudeDelta: 0.093,
+      longitudeDelta: 0.041
     },
     key: "wo380"
   }
@@ -52,6 +54,10 @@ export interface State {
 }
 
 class HomeScreen extends React.Component<Props, State> {
+  static navigationOptions = {
+    header: null
+  };
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -85,16 +91,20 @@ class HomeScreen extends React.Component<Props, State> {
           initialRegion={mockClinicData[this.state.selectedClinic].coords}
           followsUserLocation={true}
         >
-          <MapView.Marker
-            coordinate={mockClinicData[this.state.selectedClinic].coords}
-            title="Waterloo Walk-In"
-            description="Some description"
-          >
-            <MapView.Callout>
-              <Text>{mockClinicData[this.state.selectedClinic].name}</Text>
-              <Text>{mockClinicData[this.state.selectedClinic].address}</Text>
-            </MapView.Callout>
-          </MapView.Marker>
+          {mockClinicData.map((clinic, index) => (
+            <MapView.Marker
+              coordinate={clinic.coords}
+              title="Waterloo Walk-In"
+              description="Some description"
+              key={clinic.name + clinic.address}
+              pinColor={this.state.selectedClinic === index ? "red" : "blue"}
+            >
+              <MapView.Callout>
+                <Text>{clinic.name}</Text>
+                <Text>{clinic.address}</Text>
+              </MapView.Callout>
+            </MapView.Marker>
+          ))}
         </MapView>
         <SearchBar />
 
@@ -119,6 +129,9 @@ class HomeScreen extends React.Component<Props, State> {
               onPress={() => {
                 console.log("ClinicCard onPress called with index: ", index);
                 this.setState({ selectedClinic: index });
+                this.props.navigation.navigate("ClinicDetail", {
+                  title: mockClinicData[index].name
+                });
               }}
             />
           )}
@@ -128,4 +141,13 @@ class HomeScreen extends React.Component<Props, State> {
   }
 }
 
-export default HomeScreen;
+const stackNav = createStackNavigator({
+  Map: {
+    screen: HomeScreen
+  },
+  ClinicDetail: {
+    screen: ClinicDetail
+  }
+});
+
+export default stackNav;

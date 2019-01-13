@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { View, Button, TouchableOpacity, Text } from "react-native";
+import { View, ScrollView, Button, TouchableOpacity, Text } from "react-native";
 import styled from "styled-components/native";
-// import Icon from "react-native-vector-icons/fontawesome";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
 
 export interface Props {}
 
@@ -22,8 +21,37 @@ class ClinicDetail extends Component<Props> {
   };
 
   render() {
+    //index 0 == monday
+    const hoursOfOperation = [
+      { start: 9, end: 20 },
+      { start: 10, end: 21 },
+      { start: 9, end: 20 },
+      { start: 10, end: 21 },
+      { start: 9, end: 20 },
+      { start: 10, end: 16 },
+      { start: 10, end: 16 }
+    ];
+
+    const daysOfWeek = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ];
+
+    const serviceIcons = {
+      Pharmacy: "pill",
+      "Kid Friendly": "heart",
+      Accessible: "wheelchair-accessibility"
+    };
+
+    const mockServices = ["Pharmacy", "Kid Friendly", "Accessible"];
+
     return (
-      <View style={{ backgroundColor: "white", flex: 1 }}>
+      <ScrollView style={{ backgroundColor: "white", flex: 1 }}>
         //CHECK IN CARD
         <View
           style={{
@@ -85,23 +113,13 @@ class ClinicDetail extends Component<Props> {
               alignItems: "center"
             }}
           >
-            <Text style={{ marginRight: 5 }}>3.2</Text>
-            //HACKY
-            {[1, 1, 1, 0, 0].map((num, idx) => {
-              return (
-                <Ionicons
-                  name="md-star"
-                  size={24}
-                  color={num ? "purple" : "lightgrey"}
-                  key={idx + "star"}
-                />
-              );
-            })}
+            <Text>S: 9:00am - 8:00pm</Text>
           </View>
           <View
             style={{
               flex: 1,
               borderWidth: 1,
+              borderLeftWidth: 0,
               borderColor: "lightgrey",
               borderRightColor: "white",
               padding: 20,
@@ -110,22 +128,103 @@ class ClinicDetail extends Component<Props> {
               alignItems: "center"
             }}
           >
-            <Text>OPEN TODAY</Text>
+            <Text>OPEN NOW</Text>
           </View>
         </View>
-      </View>
+        //HOURS OF OPERATION
+        <View style={{ padding: 20 }}>
+          {hoursOfOperation.map((hours, index) => {
+            const start = hours.start % 12;
+            const startSuffix = hours.start >= 12 ? "pm" : "am";
+            const end = hours.end % 12;
+            const endSuffix = hours.end >= 12 ? "pm" : "am";
+            return (
+              <Text
+                key={daysOfWeek[index]}
+                style={{ fontSize: 16, marginTop: 3 }}
+              >
+                {daysOfWeek[index]}: {start}:00{startSuffix} - {end}:00
+                {endSuffix}
+              </Text>
+            );
+          })}
+        </View>
+        //REVIEWS
+        <View
+          style={{
+            borderWidth: 1,
+            borderColor: "white",
+            borderTopColor: "lightgrey",
+            borderBottomColor: "lightgrey",
+            padding: 20,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
+            <Text
+              style={{
+                flex: 1,
+                textAlign: "center"
+              }}
+            >
+              12 reviews
+            </Text>
+            <View
+              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+            >
+              <Text style={{ marginRight: 5 }}>3.2</Text>
+              //HACKY
+              {[1, 1, 1, 0, 0].map((num, idx) => {
+                return (
+                  <Ionicons
+                    name="md-star"
+                    size={24}
+                    color={num ? "purple" : "lightgrey"}
+                    key={idx + "star"}
+                  />
+                );
+              })}
+            </View>
+          </View>
+        </View>
+        //SERVICES
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            padding: 20,
+            alignItems: "flex-end"
+          }}
+        >
+          {mockServices.map(service => (
+            <View
+              style={{ flexDirection: "column", alignItems: "center" }}
+              key={service}
+            >
+              <MaterialCommunityIcons
+                name={serviceIcons[service]}
+                size={32}
+                color="purple"
+                style={{ marginLeft: 10, marginRight: 20 }}
+              />
+              <Text style={{ marginTop: 10, color: "grey" }}>
+                {service.toUpperCase()}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
     );
   }
 }
-
-const Testview = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-const MyButton = styled.Button``;
-
-const Container = styled.View``;
 
 const Circle = styled.View`
   background-color: #0ab20a;

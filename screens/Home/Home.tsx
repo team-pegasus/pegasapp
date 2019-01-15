@@ -1,9 +1,10 @@
 import React from "react";
-import { View, FlatList, Text, Button } from "react-native";
+import { View, FlatList, Text } from "react-native";
 import { MapView } from "expo";
+import { createStackNavigator } from "react-navigation";
+
 import SearchBar from "./components/SearchBar";
 import ClinicCard from "./components/ClinicCard";
-import { createStackNavigator } from "react-navigation";
 import ClinicDetail from "../ClinicDetail";
 
 const mockClinicData = [
@@ -45,9 +46,9 @@ const mockClinicData = [
   }
 ];
 
-const waterlooLocation = {};
-
-export interface Props {}
+export interface Props {
+  navigation: any;
+}
 
 export interface State {
   selectedClinic: number;
@@ -82,16 +83,11 @@ class HomeScreen extends React.Component<Props, State> {
             width: "100%",
             height: "100%"
           }}
-          // initialRegion={{
-          //   latitude: 43.4723,
-          //   longitude: -80.5449,
-          //   latitudeDelta: 0.0922,
-          //   longitudeDelta: 0.0421
-          // }}
           initialRegion={mockClinicData[this.state.selectedClinic].coords}
           followsUserLocation={true}
         >
           {mockClinicData.map((clinic, index) => (
+            //@ts-ignore -- MapView.Marker not typed
             <MapView.Marker
               coordinate={clinic.coords}
               title="Waterloo Walk-In"
@@ -99,10 +95,16 @@ class HomeScreen extends React.Component<Props, State> {
               key={clinic.name + clinic.address}
               pinColor={this.state.selectedClinic === index ? "red" : "blue"}
             >
+              {/* bootleg way of ignoring ts error
+              // @ts-ignore */}
               <MapView.Callout>
                 <Text>{clinic.name}</Text>
                 <Text>{clinic.address}</Text>
+                {/* bootleg way of ignoring ts error
+              // @ts-ignore */}
               </MapView.Callout>
+              {/* bootleg way of ignoring ts error
+              // @ts-ignore */}
             </MapView.Marker>
           ))}
         </MapView>

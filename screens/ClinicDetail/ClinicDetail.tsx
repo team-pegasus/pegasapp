@@ -1,18 +1,20 @@
 import React, { Component } from "react";
-import { View, ScrollView, Button, TouchableOpacity, Text } from "react-native";
-import styled from "styled-components/native";
+import { View, ScrollView, Text } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
+//@ts-ignore -- RN styled components arent' typed
+import styled from "styled-components/native";
 
-export interface Props {}
+export interface Props {
+  navigation: any;
+}
 
 class ClinicDetail extends Component<Props> {
   static defaultProps = {};
 
+  //@ts-ignore -- navigation options
   static navigationOptions = ({ navigation }) => {
-    console.log(navigation.state.params);
     return {
       title: `${navigation.state.params.title}`,
-      // title: "testing!",
       headerTitleStyle: { textAlign: "center", alignSelf: "center" },
       headerStyle: {
         backgroundColor: "white"
@@ -210,6 +212,7 @@ class ClinicDetail extends Component<Props> {
               key={service}
             >
               <MaterialCommunityIcons
+                //@ts-ignore -- serviceIcons access via index signature
                 name={serviceIcons[service]}
                 size={32}
                 color="purple"

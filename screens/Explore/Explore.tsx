@@ -1,11 +1,9 @@
 import React from "react";
 import { View, FlatList, Text } from "react-native";
 import { MapView } from "expo";
-import { createStackNavigator } from "react-navigation";
 
 import SearchBar from "./components/SearchBar";
 import ClinicCard from "./components/ClinicCard";
-import ClinicDetail from "../ClinicDetail";
 
 const mockClinicData = [
   {
@@ -54,7 +52,7 @@ export interface State {
   selectedClinic: number;
 }
 
-class HomeScreen extends React.Component<Props, State> {
+class Explore extends React.Component<Props, State> {
   static navigationOptions = {
     header: null
   };
@@ -142,13 +140,4 @@ class HomeScreen extends React.Component<Props, State> {
   }
 }
 
-const stackNav = createStackNavigator({
-  Map: {
-    screen: HomeScreen
-  },
-  ClinicDetail: {
-    screen: ClinicDetail
-  }
-});
-
-export default stackNav;
+export default Explore;

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Facebook } from "expo";
-import { View, Button, Text } from "react-native";
+import { View, Text } from "react-native";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
 import { FontAwesome } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
@@ -9,12 +9,8 @@ export interface LoginProps {
   navigation: any;
 }
 
-export default class Login extends React.Component<LoginProps, any> {
-  constructor(props: LoginProps) {
-    super(props);
-  }
-
-  logIn = async () => {
+export default class Login extends React.Component<LoginProps> {
+  logInWithFacebook = async () => {
     try {
       const loginResponse = await Facebook.logInWithReadPermissionsAsync(
         "2379249225690629", //app ID
@@ -52,7 +48,7 @@ export default class Login extends React.Component<LoginProps, any> {
   render() {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <FacebookButton onPress={this.logIn}>
+        <FacebookButton onPress={this.logInWithFacebook}>
           <FontAwesome
             name="facebook"
             size={32}

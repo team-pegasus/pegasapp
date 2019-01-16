@@ -1,5 +1,5 @@
 import React from "react";
-import { View, FlatList, Text } from "react-native";
+import { View, FlatList, Text, StatusBar } from "react-native";
 import { MapView } from "expo";
 
 import SearchBar from "./components/SearchBar";
@@ -72,6 +72,8 @@ class Explore extends React.Component<Props, State> {
           flexDirection: "column"
         }}
       >
+        <StatusBar barStyle="dark-content" />
+
         <MapView
           style={{
             position: "absolute",

@@ -1,15 +1,31 @@
 import * as React from "react";
 import { Facebook, Google } from "expo";
-import { View, Text } from "react-native";
+import { View, Text, StatusBar } from "react-native";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
 import { FontAwesome } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
+import firebase from "firebase";
 
 export interface LoginProps {
   navigation: any;
 }
 
 export default class Login extends React.Component<LoginProps> {
+  componentDidMount() {
+    this.checkIfLoggedIn();
+  }
+
+  checkIfLoggedIn = () => {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.props.navigation.navigate("App");
+      }
+      // else {
+      //   this.props.navigation.navigate("Login");
+      // }
+    });
+  };
+
   logInWithGoogle = async () => {
     try {
       const result = await Google.logInAsync({
@@ -21,6 +37,20 @@ export default class Login extends React.Component<LoginProps> {
       });
 
       if (result.type === "success") {
+        console.log("google result: ", result);
+
+        const { idToken } = result;
+
+        //sign into firebase
+        const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+
+        firebase
+          .auth()
+          .signInAndRetrieveDataWithCredential(credential)
+          .catch(err => {
+            console.log(err);
+          });
+
         this.props.navigation.navigate("App");
         return result.accessToken;
       } else {
@@ -44,6 +74,18 @@ export default class Login extends React.Component<LoginProps> {
 
       if (type === "success") {
         console.log("success!");
+
+        //sign into firebase
+        const credential = firebase.auth.FacebookAuthProvider.credential(token);
+
+        console.log("firebase credential: ", credential);
+
+        firebase
+          .auth()
+          .signInAndRetrieveDataWithCredential(credential)
+          .catch(err => {
+            console.log(err);
+          });
 
         //other posisbilities: name, gender, picture
         const fields = "id,first_name,last_name,email";
@@ -76,6 +118,8 @@ export default class Login extends React.Component<LoginProps> {
           backgroundColor: "#0A0D32"
         }}
       >
+        <StatusBar barStyle="light-content" />
+
         <View
           style={{ flex: 2, justifyContent: "center", alignItems: "center" }}
         >

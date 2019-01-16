@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { createBottomTabNavigator } from "react-navigation";
+import { createStackNavigator } from "react-navigation";
 import Icon from "react-native-vector-icons/Ionicons";
 import Home from "./screens/Home";
+import Login from "./screens/Login";
 
 export interface Props {
   navigation: any;
@@ -72,8 +74,23 @@ const RootStack = createBottomTabNavigator(
   }
 );
 
-export default class App extends React.Component {
-  render() {
-    return <RootStack />;
+const stackNav = createStackNavigator(
+  {
+    Login: {
+      screen: Login
+    },
+    App: {
+      screen: RootStack
+    }
+  },
+  {
+    headerMode: "none"
   }
-}
+);
+
+// export default class App extends React.Component {
+//   render() {
+//     return <stackNav />;
+//   }
+// }
+export default stackNav;

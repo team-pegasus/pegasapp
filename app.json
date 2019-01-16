@@ -5,5 +5,8 @@
       "sourceExts": ["ts", "tsx"],
       "transformer": "node_modules/react-native-typescript-transformer/index.js"
     }
-  }
+  },
+  "facebookScheme": "fb2379249225690629",
+  "facebookAppId": "2379249225690629",
+  "facebookDisplayName": "Pegasus"
 }

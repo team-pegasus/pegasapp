@@ -67,7 +67,6 @@ class HomeScreen extends React.Component<Props, State> {
   }
 
   render() {
-    console.log("home render called.");
     return (
       <View
         style={{

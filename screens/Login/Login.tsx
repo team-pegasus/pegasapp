@@ -18,7 +18,7 @@ export default class Login extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      loading: true
+      loading: false
     };
   }
 
@@ -31,7 +31,6 @@ export default class Login extends React.Component<Props, State> {
       if (user) {
         this.props.navigation.navigate("App");
       } else {
-        this.setState({ loading: false });
       }
     });
   };
@@ -109,7 +108,6 @@ export default class Login extends React.Component<Props, State> {
 
         console.log("User Data: ", userData);
 
-        this.setState({ loading: true });
         this.props.navigation.navigate("App");
       } else {
         // type === 'cancel'
@@ -145,7 +143,6 @@ export default class Login extends React.Component<Props, State> {
         }}
       >
         <StatusBar barStyle="light-content" />
-
         {this.state.loading ? (
           <React.Fragment>
             {title}

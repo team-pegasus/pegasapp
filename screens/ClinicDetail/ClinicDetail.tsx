@@ -22,6 +22,12 @@ class ClinicDetail extends Component<Props> {
     };
   };
 
+  onCheckInPress = () => {
+    this.props.navigation.navigate("CheckInForm", {
+      title: "yoyoyo"
+    });
+  };
+
   render() {
     //index 0 == monday
     const hoursOfOperation = [
@@ -91,7 +97,7 @@ class ClinicDetail extends Component<Props> {
               <Text style={{ fontSize: 20 }}>15 minutes</Text>
             </View>
           </View>
-          <CheckInButton>
+          <CheckInButton onPress={this.onCheckInPress}>
             <Text style={{ color: "white" }}>CHECK-IN</Text>
           </CheckInButton>
         </View>

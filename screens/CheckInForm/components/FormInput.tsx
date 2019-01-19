@@ -10,7 +10,11 @@ export interface State {}
 const FormInput = (props: Props) => {
   const { label } = props;
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View
+      style={{
+        marginBottom: 20
+      }}
+    >
       <Text style={{ color: "grey", marginBottom: 5 }}>{label}</Text>
       <TextInput
         style={{

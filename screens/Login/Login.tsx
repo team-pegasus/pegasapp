@@ -1,16 +1,27 @@
 import * as React from "react";
 import { Facebook, Google } from "expo";
-import { View, Text, StatusBar } from "react-native";
+import { View, Text, StatusBar, ActivityIndicator } from "react-native";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
 import { FontAwesome } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
 import firebase from "firebase";
 
-export interface LoginProps {
+export interface Props {
   navigation: any;
 }
 
-export default class Login extends React.Component<LoginProps> {
+export interface State {
+  loading: boolean;
+}
+
+export default class Login extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      loading: true
+    };
+  }
+
   componentDidMount() {
     this.checkIfLoggedIn();
   }
@@ -19,10 +30,9 @@ export default class Login extends React.Component<LoginProps> {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.props.navigation.navigate("App");
+      } else {
+        this.setState({ loading: false });
       }
-      // else {
-      //   this.props.navigation.navigate("Login");
-      // }
     });
   };
 
@@ -98,6 +108,8 @@ export default class Login extends React.Component<LoginProps> {
         const userData = await response.json();
 
         console.log("User Data: ", userData);
+
+        this.setState({ loading: true });
         this.props.navigation.navigate("App");
       } else {
         // type === 'cancel'
@@ -109,6 +121,20 @@ export default class Login extends React.Component<LoginProps> {
   };
 
   render() {
+    let title = (
+      <View
+        style={{
+          flex: 2,
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <Text style={{ fontSize: 35, color: "white", fontWeight: "400" }}>
+          MedCare
+        </Text>
+      </View>
+    );
+
     return (
       <View
         style={{
@@ -120,34 +146,37 @@ export default class Login extends React.Component<LoginProps> {
       >
         <StatusBar barStyle="light-content" />
 
-        <View
-          style={{ flex: 2, justifyContent: "center", alignItems: "center" }}
-        >
-          <Text style={{ fontSize: 35, color: "white", fontWeight: "400" }}>
-            MedCare
-          </Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <FacebookButton onPress={this.logInWithFacebook}>
-            <FontAwesome
-              name="facebook"
-              size={32}
-              color="white"
-              style={{ marginRight: 10 }}
-            />
-            <Text style={{ color: "white" }}>Sign in with Facebook</Text>
-          </FacebookButton>
+        {this.state.loading ? (
+          <React.Fragment>
+            {title}
+            <ActivityIndicator size="large" style={{ flex: 1 }} />
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            {title}
+            <View style={{ flex: 1 }}>
+              <FacebookButton onPress={this.logInWithFacebook}>
+                <FontAwesome
+                  name="facebook"
+                  size={32}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={{ color: "white" }}>Sign in with Facebook</Text>
+              </FacebookButton>
 
-          <GoogleButton onPress={this.logInWithGoogle}>
-            <FontAwesome
-              name="google"
-              size={32}
-              color="white"
-              style={{ marginRight: 10 }}
-            />
-            <Text style={{ color: "white" }}>Sign in with Google</Text>
-          </GoogleButton>
-        </View>
+              <GoogleButton onPress={this.logInWithGoogle}>
+                <FontAwesome
+                  name="google"
+                  size={32}
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={{ color: "white" }}>Sign in with Google</Text>
+              </GoogleButton>
+            </View>
+          </React.Fragment>
+        )}
       </View>
     );
   }

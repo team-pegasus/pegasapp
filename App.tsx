@@ -1,34 +1,19 @@
-import { createStackNavigator } from "react-navigation";
-import Login from "./screens/Login";
-import TabNavigator from "./screens/TabNavigator";
-import Settings from "./screens/Settings";
+import * as React from "react";
+
+import store from "./AppStore";
+import { Provider } from "react-redux";
+import AppNavigator from "./AppNavigator";
+
 import firebase from "firebase";
 import { firebaseConfig } from "./config";
-
 firebase.initializeApp(firebaseConfig);
 
-export interface Props {
-  navigation: any;
-}
-
-const stackNav = createStackNavigator(
-  {
-    Login: {
-      screen: Login
-    },
-    App: {
-      screen: TabNavigator
-    },
-    Settings: {
-      screen: Settings
-    }
-  },
-  {
-    headerMode: "none",
-    navigationOptions: {
-      gesturesEnabled: false
-    }
+export default class App extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <AppNavigator />
+      </Provider>
+    );
   }
-);
-
-export default stackNav;
+}

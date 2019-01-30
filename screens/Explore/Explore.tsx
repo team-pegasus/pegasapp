@@ -5,6 +5,9 @@ import { MapView } from "expo";
 import SearchBar from "./components/SearchBar";
 import ClinicCard from "./components/ClinicCard";
 
+import { connect } from "react-redux";
+import { thunk_action_creator } from "../../actions/clinicActions";
+
 const mockClinicData = [
   {
     name: "Waterloo Walk-In",
@@ -46,6 +49,7 @@ const mockClinicData = [
 
 export interface Props {
   navigation: any;
+  dispatch: any;
 }
 
 export interface State {
@@ -62,7 +66,12 @@ class Explore extends React.Component<Props, State> {
     this.state = {
       selectedClinic: 0
     };
+    this.handleClinicFetch();
   }
+
+  handleClinicFetch = () => {
+    this.props.dispatch(thunk_action_creator("jitindodd"));
+  };
 
   render() {
     return (
@@ -142,4 +151,10 @@ class Explore extends React.Component<Props, State> {
   }
 }
 
-export default Explore;
+const mapStateToProps = (state: any) => {
+  return {
+    data: state
+  };
+};
+
+export default connect(mapStateToProps)(Explore);

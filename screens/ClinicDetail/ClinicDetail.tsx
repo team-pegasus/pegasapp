@@ -243,7 +243,7 @@ const Circle = styled.View`
 `;
 
 const CheckInButton = styled.TouchableOpacity`
-  background-color: orange;
+  background-color: #7bcc2a;
   border-radius: 5px;
   width: auto;
   align-items: center;

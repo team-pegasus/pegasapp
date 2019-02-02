@@ -1,17 +1,12 @@
 import * as React from "react";
-import {
-  View,
-  Keyboard,
-  TouchableWithoutFeedback,
-  Text,
-  Picker
-} from "react-native";
-// import { Picker } from "expo";
+import { View, Keyboard, TouchableWithoutFeedback, Text } from "react-native";
 import FormInput from "./components/FormInput";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
 
-export interface Props {}
+export interface Props {
+  navigation: any;
+}
 
 export interface State {}
 
@@ -19,7 +14,6 @@ export default class CheckInForm extends React.Component<Props, State> {
   //@ts-ignore -- navigation options
   static navigationOptions = ({ navigation }) => {
     return {
-      //   title: `${navigation.state.params.title}`,
       title: "Waterloo Walk-In",
       headerTitleStyle: { textAlign: "center", alignSelf: "center" },
       headerStyle: {
@@ -32,6 +26,12 @@ export default class CheckInForm extends React.Component<Props, State> {
     super(props);
     this.state = {};
   }
+
+  onFormSubmit = () => {
+    this.props.navigation.navigate("PendingApproval", {
+      title: "Waterloo Walk-In"
+    });
+  };
 
   public render() {
     return (
@@ -51,7 +51,7 @@ export default class CheckInForm extends React.Component<Props, State> {
               <FormInput label={"FIRST NAME"} />
               <FormInput label={"LAST NAME"} />
               <FormInput label={"REASON FOR VISIT"} />
-              <ConfirmButton onPress={() => {}}>
+              <ConfirmButton onPress={this.onFormSubmit}>
                 <Text style={{ color: "white" }}>CONFIRM</Text>
               </ConfirmButton>
             </View>

@@ -1,4 +1,4 @@
-import store from "../AppStore";
+import { store } from "../helpers/AppStore";
 
 export const fetchClinics = () => {
   return {

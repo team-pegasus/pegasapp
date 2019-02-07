@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View, Keyboard, TouchableWithoutFeedback, Text } from "react-native";
-import FormInput from "./components/FormInput";
+import FormInput from "../../shared_components/FormInput";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
 
@@ -50,7 +50,7 @@ export default class CheckInForm extends React.Component<Props, State> {
             >
               <FormInput label={"FIRST NAME"} />
               <FormInput label={"LAST NAME"} />
-              <FormInput label={"REASON FOR VISIT"} />
+              <FormInput label={"REASON FOR VISIT"} />>
               <ConfirmButton onPress={this.onFormSubmit}>
                 <Text style={{ color: "white" }}>CONFIRM</Text>
               </ConfirmButton>

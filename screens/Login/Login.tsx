@@ -5,16 +5,25 @@ import { View, Text, StatusBar, ActivityIndicator } from "react-native";
 import styled from "styled-components/native";
 import { FontAwesome } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
 import firebase from "firebase";
+import { LinearGradient } from "expo";
+
+import { connect } from "react-redux";
+import { userActions } from "../../actions/userActions";
 
 export interface Props {
   navigation: any;
+  dispatch: Function;
 }
 
 export interface State {
   loading: boolean;
 }
 
-export default class Login extends React.Component<Props, State> {
+export class Login extends React.Component<Props, State> {
+  static navigationOptions = {
+    header: null
+  };
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -23,16 +32,23 @@ export default class Login extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.checkIfLoggedIn();
+    const user = {
+      first_name: "jitin",
+      last_name: "dodd",
+      email: "jd@gmail.com"
+      // password: "test123!"
+    };
+
+    this.props.dispatch(userActions.register(user));
   }
 
   checkIfLoggedIn = () => {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.props.navigation.navigate("App");
-      } else {
-      }
-    });
+    // firebase.auth().onAuthStateChanged(user => {
+    //   if (user) {
+    //     this.props.navigation.navigate("App");
+    //   } else {
+    //   }
+    // });
   };
 
   logInWithGoogle = async () => {
@@ -60,7 +76,12 @@ export default class Login extends React.Component<Props, State> {
             console.log(err);
           });
 
-        this.props.navigation.navigate("App");
+        this.props.navigation.navigate("App", {
+          headerMode: "none",
+          navigationOptions: {
+            gesturesEnabled: false
+          }
+        });
         return result.accessToken;
       } else {
         return { cancelled: true };
@@ -80,6 +101,8 @@ export default class Login extends React.Component<Props, State> {
         }
       );
       const { type, token, expires } = loginResponse;
+
+      console.log("Login response from Facebook: ", loginResponse);
 
       if (type === "success") {
         console.log("success!");
@@ -118,11 +141,49 @@ export default class Login extends React.Component<Props, State> {
     }
   };
 
+  signInWithEmail = () => {
+    this.props.navigation.navigate("LogInWithEmail", {
+      headerMode: "float"
+    });
+  };
+
+  renderButtons = () => (
+    <View style={{ flex: 1 }}>
+      <EmailButton onPress={this.signInWithEmail}>
+        <FontAwesome
+          name="envelope"
+          size={26}
+          color="white"
+          style={{ marginRight: 10 }}
+        />
+        <Text style={{ color: "white" }}>Sign in with email</Text>
+      </EmailButton>
+      <FacebookButton onPress={this.logInWithFacebook}>
+        <FontAwesome
+          name="facebook"
+          size={32}
+          color="white"
+          style={{ marginRight: 10 }}
+        />
+        <Text style={{ color: "white" }}>Sign in with Facebook</Text>
+      </FacebookButton>
+      <GoogleButton onPress={this.logInWithGoogle}>
+        <FontAwesome
+          name="google"
+          size={32}
+          color="white"
+          style={{ marginRight: 10 }}
+        />
+        <Text style={{ color: "white" }}>Sign in with Google</Text>
+      </GoogleButton>
+    </View>
+  );
+
   render() {
     let title = (
       <View
         style={{
-          flex: 2,
+          flex: 1,
           justifyContent: "center",
           alignItems: "center"
         }}
@@ -134,50 +195,57 @@ export default class Login extends React.Component<Props, State> {
     );
 
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#0A0D32"
-        }}
+      <LinearGradient
+        style={{ flex: 1 }}
+        // colors={["#0F2027", "#203A43", "#2C5364"]}
+        colors={["#0f0c29", "#302b63", "#24243e"]}
+        // colors={["#192f6a", "#3b5998"]}
+        // colors={["#000428", "#004e92"]}
       >
-        <StatusBar barStyle="light-content" />
-        {this.state.loading ? (
-          <React.Fragment>
-            {title}
-            <ActivityIndicator size="large" style={{ flex: 1 }} />
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            {title}
-            <View style={{ flex: 1 }}>
-              <FacebookButton onPress={this.logInWithFacebook}>
-                <FontAwesome
-                  name="facebook"
-                  size={32}
-                  color="white"
-                  style={{ marginRight: 10 }}
-                />
-                <Text style={{ color: "white" }}>Sign in with Facebook</Text>
-              </FacebookButton>
-
-              <GoogleButton onPress={this.logInWithGoogle}>
-                <FontAwesome
-                  name="google"
-                  size={32}
-                  color="white"
-                  style={{ marginRight: 10 }}
-                />
-                <Text style={{ color: "white" }}>Sign in with Google</Text>
-              </GoogleButton>
-            </View>
-          </React.Fragment>
-        )}
-      </View>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+            // backgroundColor: "#0A0D32"
+          }}
+        >
+          <StatusBar barStyle="light-content" />
+          {this.state.loading ? (
+            <React.Fragment>
+              {title}
+              <ActivityIndicator size="large" style={{ flex: 1 }} />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              {title}
+              {this.renderButtons()}
+            </React.Fragment>
+          )}
+        </View>
+      </LinearGradient>
     );
   }
 }
+
+const mapStateToProps = (state: any) => {
+  return {
+    data: state
+  };
+};
+
+export default connect(mapStateToProps)(Login);
+
+const EmailButton = styled.TouchableOpacity`
+  flex-direction: row;
+  background-color: #31a6e9;
+  border-radius: 5px;
+  width: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-top: 15px;
+`;
 
 const FacebookButton = styled.TouchableOpacity`
   flex-direction: row;
@@ -185,6 +253,7 @@ const FacebookButton = styled.TouchableOpacity`
   border-radius: 5px;
   width: auto;
   align-items: center;
+  justify-content: center;
   padding: 10px;
   margin-top: 15px;
 `;
@@ -195,6 +264,7 @@ const GoogleButton = styled.TouchableOpacity`
   border-radius: 5px;
   width: auto;
   align-items: center;
+  justify-content: center;
   padding: 10px;
   margin-top: 15px;
 `;

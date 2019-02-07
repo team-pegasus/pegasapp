@@ -6,3 +6,5 @@ export const firebaseConfig = {
   storageBucket: "pegasus-1528585171799.appspot.com",
   messagingSenderId: "901411520285"
 };
+
+export const apiUrl = "https://pegabackk.herokuapp.com";

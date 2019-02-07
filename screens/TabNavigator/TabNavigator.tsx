@@ -1,5 +1,8 @@
 import * as React from "react";
-import { createBottomTabNavigator } from "react-navigation";
+import {
+  createBottomTabNavigator,
+  createStackNavigator
+} from "react-navigation";
 import { Ionicons } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
 
 import HomeScreenNavigator from "../HomeScreenNavigator";
@@ -31,5 +34,10 @@ const tabNavigator = createBottomTabNavigator(
     tabBarOptions: {}
   }
 );
+
+tabNavigator.navigationOptions = {
+  header: null,
+  gesturesEnabled: false
+};
 
 export default tabNavigator;

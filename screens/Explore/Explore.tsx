@@ -18,7 +18,16 @@ export interface State {
   selectedClinic: number;
 }
 
+const fallBackData = {
+  latitude: 43.4723,
+  longitude: -80.5449,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05
+};
+
 class Explore extends React.Component<Props, State> {
+  map: any; // used as a ref for MapView
+
   static navigationOptions = {
     header: null
   };
@@ -54,10 +63,28 @@ class Explore extends React.Component<Props, State> {
   // };
 
   handleClinicFetch = () => {
-    this.props.dispatch(clinicActions.fetchClinics());
+    this.props.dispatch(clinicActions.fetchAllClinics());
   };
 
-  componentWillReceiveProps(props: Props) {}
+  handleSearch = (query: string) => {
+    console.log("Explore: search submitted with query: ", query);
+    this.props.dispatch(clinicActions.fetchClinicsByAddress(query));
+  };
+
+  componentWillReceiveProps(props: Props) {
+    if (props.clinics.length) {
+      this.handleMapCenter(props.clinics[0]);
+    }
+  }
+
+  handleMapCenter = (centerClinic: any) => {
+    this.map.animateToRegion({
+      latitude: centerClinic.latitude || fallBackData.latitude,
+      longitude: centerClinic.longitude || fallBackData.longitude,
+      latitudeDelta: fallBackData.latitudeDelta,
+      longitudeDelta: fallBackData.longitudeDelta
+    });
+  };
 
   render() {
     const { clinics } = this.props;
@@ -78,12 +105,17 @@ class Explore extends React.Component<Props, State> {
             width: "100%",
             height: "100%"
           }}
+          ref={map => {
+            this.map = map;
+          }}
           // initialRegion={mockClinicData[this.state.selectedClinic].coords}
           initialRegion={{
-            latitude: clinics[0].latitude,
-            longitude: clinics[0].longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421
+            latitude: clinics[0] ? clinics[0].latitude : fallBackData.latitude,
+            longitude: clinics[0]
+              ? clinics[0].longitude
+              : fallBackData.longitude,
+            latitudeDelta: fallBackData.latitudeDelta,
+            longitudeDelta: fallBackData.longitudeDelta
           }}
           followsUserLocation={true}
         >
@@ -115,39 +147,44 @@ class Explore extends React.Component<Props, State> {
             </MapView.Marker>
           ))}
         </MapView>
-        <SearchBar />
 
-        <FlatList
-          data={clinics}
-          style={{
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            left: 0,
-            height: 250
-          }}
-          showsHorizontalScrollIndicator={true}
-          showsVerticalScrollIndicator={true}
-          maxToRenderPerBatch={3}
-          keyExtractor={item => item.address}
-          renderItem={({ item, index }) => (
-            <ClinicCard
-              name={item.name}
-              address={item.address}
-              key={item.name + item.address}
-              // etr={item.etr}
-              etr={15}
-              selected={this.state.selectedClinic === index}
-              onPress={() => {
-                console.log("ClinicCard onPress called with index: ", index);
-                this.setState({ selectedClinic: index });
-                this.props.navigation.navigate("ClinicDetail", {
-                  title: clinics[index].name
-                });
-              }}
-            />
-          )}
-        />
+        <SearchBar onSearch={this.handleSearch} />
+
+        {clinics.length ? (
+          <FlatList
+            data={clinics}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              left: 0,
+              height: 250
+            }}
+            showsHorizontalScrollIndicator={true}
+            showsVerticalScrollIndicator={true}
+            maxToRenderPerBatch={3}
+            keyExtractor={item => item.address}
+            renderItem={({ item, index }) => (
+              <ClinicCard
+                name={item.name}
+                address={item.address}
+                key={item.name + item.address}
+                // etr={item.etr}
+                etr={15}
+                selected={this.state.selectedClinic === index}
+                onPress={() => {
+                  console.log("ClinicCard onPress called with index: ", index);
+                  this.setState({ selectedClinic: index });
+                  this.props.navigation.navigate("ClinicDetail", {
+                    title: clinics[index].name
+                  });
+                }}
+              />
+            )}
+          />
+        ) : (
+          <Text>yoyo</Text>
+        )}
       </View>
     );
   }

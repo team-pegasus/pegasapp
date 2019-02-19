@@ -1,22 +1,61 @@
 import { clinicConstants } from "../constants";
 import { clinicService } from "../services";
 
-export const fetchClinics = () => {
-  const request = () => {
-    return { type: clinicConstants.FETCH_CLINICS_REQUEST };
-  };
-  const success = (clinics: any) => {
-    return { type: clinicConstants.FETCH_CLINICS_SUCCESS, data: clinics };
-  };
-  const failure = (error: string) => {
-    return { type: clinicConstants.FETCH_CLINICS_FAILURE, error };
-  };
+//TODO: remove
+const auth =
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo0NiwiZXhwIjoxNTUwNjMxNzYwfQ.I7mk_O48xR5z_I-et0eHT9I6MI_kNxe2EYlnmXrhBDo";
 
-  const auth =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo0NiwiZXhwIjoxNTUwNjMxNzYwfQ.I7mk_O48xR5z_I-et0eHT9I6MI_kNxe2EYlnmXrhBDo";
+const fetchRequest = () => {
+  return { type: clinicConstants.FETCH_CLINICS_REQUEST };
+};
+const fetchSuccess = (clinics: any) => {
+  return { type: clinicConstants.FETCH_CLINICS_SUCCESS, data: clinics };
+};
+const fetchFailure = (error: string) => {
+  return { type: clinicConstants.FETCH_CLINICS_FAILURE, error };
+};
 
+export const fetchClinicsByLatLong = (lat: number, lng: number) => {
   return (dispatch: Function) => {
-    dispatch(request());
+    dispatch(fetchRequest());
+    clinicService
+      .fetchClinicsByLatLong(/*pass in auth token*/ auth, lat, lng)
+      .then((response: any) => {
+        console.log(
+          "clinicActions: fetched all clinics by lat/long successfully: ",
+          response
+        );
+        dispatch(fetchSuccess(response));
+      })
+      .catch(err => {
+        console.log("clinicActions: clinics fetch by lat/long error: ", err);
+        dispatch(fetchFailure(err.toString()));
+      });
+  };
+};
+
+export const fetchClinicsByAddress = (address: string) => {
+  return (dispatch: Function) => {
+    dispatch(fetchRequest());
+    clinicService
+      .fetchClinicsByAddress(/*pass in auth token*/ auth, address)
+      .then((response: any) => {
+        console.log(
+          "clinicActions: fetched all clinics by address successfully: ",
+          response
+        );
+        dispatch(fetchSuccess(response));
+      })
+      .catch(err => {
+        console.log("clinicActions: clinics fetch by address error: ", err);
+        dispatch(fetchFailure(err.toString()));
+      });
+  };
+};
+
+export const fetchAllClinics = () => {
+  return (dispatch: Function) => {
+    dispatch(fetchRequest());
     clinicService
       .fetchAllClinics(/*pass in auth token*/ auth)
       .then((response: any) => {
@@ -24,15 +63,17 @@ export const fetchClinics = () => {
           "clinicActions: fetched all clinics successfully: ",
           response
         );
-        dispatch(success(response));
+        dispatch(fetchSuccess(response));
       })
       .catch(err => {
         console.log("clinicActions: all clinics fetch error: ", err);
-        dispatch(failure(err.toString()));
+        dispatch(fetchFailure(err.toString()));
       });
   };
 };
 
 export const clinicActions = {
-  fetchClinics
+  fetchAllClinics,
+  fetchClinicsByAddress,
+  fetchClinicsByLatLong
 };

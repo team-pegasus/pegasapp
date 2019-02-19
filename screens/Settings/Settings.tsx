@@ -1,20 +1,17 @@
 import * as React from "react";
 import { View, Text, Button } from "react-native";
-import firebase from "firebase";
+import { connect } from "react-redux";
+import { userActions } from "../../actions/userActions";
 
 export interface Props {
+  dispatch: Function;
   navigation: any;
 }
 
-export default class Settings extends React.Component<Props> {
+class Settings extends React.Component<Props> {
   signOutUser = async () => {
-    try {
-      await firebase.auth().signOut();
-      // navigate("Auth");
-      this.props.navigation.navigate("Login");
-    } catch (e) {
-      console.log(e);
-    }
+    this.props.dispatch(userActions.logout());
+    this.props.navigation.navigate("Login");
   };
 
   render() {
@@ -26,3 +23,5 @@ export default class Settings extends React.Component<Props> {
     );
   }
 }
+
+export default connect()(Settings);

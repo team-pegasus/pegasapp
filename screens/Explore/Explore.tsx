@@ -6,7 +6,6 @@ import SearchBar from "./components/SearchBar";
 import ClinicCard from "./components/ClinicCard";
 
 import { connect } from "react-redux";
-import { thunk_action_creator } from "../../actions/clinicActions";
 
 const mockClinicData = [
   {
@@ -69,9 +68,7 @@ class Explore extends React.Component<Props, State> {
     this.handleClinicFetch();
   }
 
-  handleClinicFetch = () => {
-    this.props.dispatch(thunk_action_creator("jitindodd"));
-  };
+  handleClinicFetch = () => {};
 
   render() {
     return (

@@ -36,11 +36,6 @@ const login = (user: UserRegistrationFields) => {
     });
 };
 
-function logout() {
-  // remove user from local storage to log user out
-  //   localStorage.removeItem("user");
-}
-
 const getById = (id: string, authToken: string) => {
   // const headers = { Authorization: authToken };
   // const requestOptions = {
@@ -53,6 +48,5 @@ const getById = (id: string, authToken: string) => {
 export const userService = {
   signup,
   login,
-  logout,
   getById
 };

@@ -4,7 +4,6 @@ import { View, Text, StatusBar, ActivityIndicator } from "react-native";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
 import { FontAwesome } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
-import firebase from "firebase";
 import { LinearGradient } from "expo";
 
 import { connect } from "react-redux";
@@ -13,43 +12,19 @@ import { userActions } from "../../actions/userActions";
 export interface Props {
   navigation: any;
   dispatch: Function;
+  loggedIn: boolean;
+  isLoading: boolean;
 }
 
-export interface State {
-  loading: boolean;
-}
-
-export class Login extends React.Component<Props, State> {
+export class Login extends React.Component<Props> {
   static navigationOptions = {
     header: null
   };
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      loading: false
-    };
+  componentWillReceiveProps(props: Props) {
+    console.log("component receiving props: ", props);
+    if (props.loggedIn) this.navigateToLoggedInExperience();
   }
-
-  componentDidMount() {
-    const user = {
-      first_name: "jitin",
-      last_name: "dodd",
-      email: "jd@gmail.com"
-      // password: "test123!"
-    };
-
-    this.props.dispatch(userActions.register(user));
-  }
-
-  checkIfLoggedIn = () => {
-    // firebase.auth().onAuthStateChanged(user => {
-    //   if (user) {
-    //     this.props.navigation.navigate("App");
-    //   } else {
-    //   }
-    // });
-  };
 
   logInWithGoogle = async () => {
     try {
@@ -62,33 +37,38 @@ export class Login extends React.Component<Props, State> {
       });
 
       if (result.type === "success") {
-        console.log("google result: ", result);
+        console.log("API: Google login success: ", result);
 
-        const { idToken } = result;
+        const { user } = result;
 
-        //sign into firebase
-        const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+        const { id, email, familyName, givenName } = user;
 
-        firebase
-          .auth()
-          .signInAndRetrieveDataWithCredential(credential)
-          .catch(err => {
-            console.log(err);
-          });
-
-        this.props.navigation.navigate("App", {
-          headerMode: "none",
-          navigationOptions: {
-            gesturesEnabled: false
-          }
-        });
-        return result.accessToken;
+        this.props.dispatch(
+          userActions.register({
+            first_name: familyName,
+            last_name: givenName,
+            email: email || "",
+            password: id
+          })
+        );
+        return result;
       } else {
+        console.log("API: Google login cancelled");
         return { cancelled: true };
       }
     } catch (e) {
+      console.log("API: Google login failed");
       return { error: true };
     }
+  };
+
+  navigateToLoggedInExperience = () => {
+    this.props.navigation.navigate("App", {
+      headerMode: "none",
+      navigationOptions: {
+        gesturesEnabled: false
+      }
+    });
   };
 
   logInWithFacebook = async () => {
@@ -100,41 +80,33 @@ export class Login extends React.Component<Props, State> {
           permissions: ["public_profile", "email"]
         }
       );
-      const { type, token, expires } = loginResponse;
 
-      console.log("Login response from Facebook: ", loginResponse);
+      const { type, token } = loginResponse;
 
       if (type === "success") {
-        console.log("success!");
-
-        //sign into firebase
-        const credential = firebase.auth.FacebookAuthProvider.credential(token);
-
-        console.log("firebase credential: ", credential);
-
-        firebase
-          .auth()
-          .signInAndRetrieveDataWithCredential(credential)
-          .catch(err => {
-            console.log(err);
-          });
-
-        //other posisbilities: name, gender, picture
-        const fields = "id,first_name,last_name,email";
+        console.log("API: Facebook login success: ", loginResponse);
 
         // Get user data using Facebook's Graph API
+        const fields = "id,first_name,last_name,email"; //other: name, gender, picture
         const response = await fetch(
           `https://graph.facebook.com/me?fields=${fields}&access_token=${token}`
         );
 
-        const userData = await response.json();
+        const user = await response.json();
+        console.log("API: Facebook user data: ", user);
 
-        console.log("User Data: ", userData);
+        const { id, email, first_name, last_name } = user;
 
-        this.props.navigation.navigate("App");
+        this.props.dispatch(
+          userActions.register({
+            first_name,
+            last_name,
+            email,
+            password: id
+          })
+        );
       } else {
-        // type === 'cancel'
-        console.log("cancel!");
+        console.log("API: Facebook login canceled!");
       }
     } catch ({ message }) {
       alert(`Facebook Login Error: ${message}`);
@@ -188,30 +160,30 @@ export class Login extends React.Component<Props, State> {
           alignItems: "center"
         }}
       >
-        <Text style={{ fontSize: 35, color: "white", fontWeight: "400" }}>
+        <Text
+          style={{
+            fontSize: 50,
+            color: "white",
+            fontWeight: "100",
+            fontFamily: "Futura-Medium"
+          }}
+        >
           MedCare
         </Text>
       </View>
     );
 
     return (
-      <LinearGradient
-        style={{ flex: 1 }}
-        // colors={["#0F2027", "#203A43", "#2C5364"]}
-        colors={["#0f0c29", "#302b63", "#24243e"]}
-        // colors={["#192f6a", "#3b5998"]}
-        // colors={["#000428", "#004e92"]}
-      >
+      <LinearGradient style={{ flex: 1 }} colors={["#0f0c29", "#302b63"]}>
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center"
-            // backgroundColor: "#0A0D32"
           }}
         >
           <StatusBar barStyle="light-content" />
-          {this.state.loading ? (
+          {this.props.loading ? (
             <React.Fragment>
               {title}
               <ActivityIndicator size="large" style={{ flex: 1 }} />
@@ -230,7 +202,8 @@ export class Login extends React.Component<Props, State> {
 
 const mapStateToProps = (state: any) => {
   return {
-    data: state
+    loggedIn: state.user.loggedIn,
+    loading: state.user.isLoading
   };
 };
 
@@ -244,6 +217,7 @@ const EmailButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   padding: 10px;
+  padding-left: 0;
   margin-top: 15px;
 `;
 

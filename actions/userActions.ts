@@ -24,6 +24,7 @@ const register = (user: UserRegistrationFields) => {
           email: user.email,
           authToken: response.auth_token
         };
+        console.log("Registered successfully: ", userData);
         dispatch(success(userData));
       })
       .catch(err => {
@@ -59,7 +60,6 @@ const login = (user: UserRegistrationFields) => {
 };
 
 function logout() {
-  userService.logout();
   return { type: userConstants.LOGOUT };
 }
 

@@ -10,22 +10,33 @@ const INITIAL_STATE = {
   loggedIn: false
 };
 
-const userReducer = (state = INITIAL_STATE, action: any) => {
+const userReducer = (state: Object = INITIAL_STATE, action: any) => {
   switch (action.type) {
-    case userConstants.LOGIN_REQUEST:
+    case userConstants.REGISTER_REQUEST:
       return {
+        ...state,
         isLoading: true
       };
+    case userConstants.REGISTER_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        loggedIn: true,
+        ...action.user
+      };
+    case userConstants.REGISTER_FAILURE:
+      return { ...state, loggedIn: false, isLoading: false };
     case userConstants.LOGIN_SUCCESS:
       return {
+        ...state,
         isLoading: false,
         loggedIn: true,
         ...action.user
       };
     case userConstants.LOGIN_FAILURE:
-      return { loggedIn: false };
+      return { ...state, loggedIn: false, isLoading: false };
     case userConstants.LOGOUT:
-      return {};
+      return INITIAL_STATE;
     default:
       return state;
   }

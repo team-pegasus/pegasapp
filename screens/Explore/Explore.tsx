@@ -1,54 +1,17 @@
 import React from "react";
 import { View, FlatList, Text, StatusBar } from "react-native";
-import { MapView } from "expo";
+import { MapView, Location, Permissions } from "expo";
 
 import SearchBar from "./components/SearchBar";
 import ClinicCard from "./components/ClinicCard";
 
 import { connect } from "react-redux";
-
-const mockClinicData = [
-  {
-    name: "Waterloo Walk-In",
-    address: "170 University Ave. W",
-    etr: 15,
-    coords: {
-      latitude: 43.4723,
-      longitude: -80.5449,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421
-    },
-    key: "ww170"
-  },
-  {
-    name: "Spruce Medical",
-    address: "318 Spruce St.",
-    etr: 30,
-    coords: {
-      latitude: 43.4766,
-      longitude: -80.5455,
-      latitudeDelta: 0.092,
-      longitudeDelta: 0.042
-    },
-    key: "sm318"
-  },
-  {
-    name: "Waterloo Onyx",
-    address: "280 Lester St.",
-    etr: 50,
-    coords: {
-      latitude: 43.48,
-      longitude: -80.52,
-      latitudeDelta: 0.093,
-      longitudeDelta: 0.041
-    },
-    key: "wo380"
-  }
-];
+import { clinicActions } from "../../actions";
 
 export interface Props {
   navigation: any;
-  dispatch: any;
+  clinics: Array<any>;
+  dispatch: Function;
 }
 
 export interface State {
@@ -68,9 +31,36 @@ class Explore extends React.Component<Props, State> {
     this.handleClinicFetch();
   }
 
-  handleClinicFetch = () => {};
+  static defaultProps = {
+    clinics: []
+  };
+
+  // componentWillMount() {
+  //   this._getLocationAsync();
+  // }
+
+  // _getLocationAsync = async () => {
+  //   let { status } = await Permissions.askAsync(Permissions.LOCATION);
+
+  //   if (status !== "granted") {
+  //     console.log("Explore: user denied permission for location");
+  //   }
+
+  //   let location = await Location.getCurrentPositionAsync({});
+  //   console.log("Explore: user granted permission for location: ", location);
+
+  //   // location.coords = {speed, longitude, latitude, accuracy}
+  //   // this.setState({ location });
+  // };
+
+  handleClinicFetch = () => {
+    this.props.dispatch(clinicActions.fetchClinics());
+  };
+
+  componentWillReceiveProps(props: Props) {}
 
   render() {
+    const { clinics } = this.props;
     return (
       <View
         style={{
@@ -88,13 +78,25 @@ class Explore extends React.Component<Props, State> {
             width: "100%",
             height: "100%"
           }}
-          initialRegion={mockClinicData[this.state.selectedClinic].coords}
+          // initialRegion={mockClinicData[this.state.selectedClinic].coords}
+          initialRegion={{
+            latitude: clinics[0].latitude,
+            longitude: clinics[0].longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421
+          }}
           followsUserLocation={true}
         >
-          {mockClinicData.map((clinic, index) => (
+          {clinics.map((clinic, index) => (
             //@ts-ignore -- MapView.Marker not typed
             <MapView.Marker
-              coordinate={clinic.coords}
+              // coordinate={clinic.coords}
+              coordinate={{
+                latitude: clinic.latitude,
+                longitude: clinic.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421
+              }}
               title="Waterloo Walk-In"
               description="Some description"
               key={clinic.name + clinic.address}
@@ -116,7 +118,7 @@ class Explore extends React.Component<Props, State> {
         <SearchBar />
 
         <FlatList
-          data={mockClinicData}
+          data={clinics}
           style={{
             position: "absolute",
             bottom: 0,
@@ -127,17 +129,20 @@ class Explore extends React.Component<Props, State> {
           showsHorizontalScrollIndicator={true}
           showsVerticalScrollIndicator={true}
           maxToRenderPerBatch={3}
+          keyExtractor={item => item.address}
           renderItem={({ item, index }) => (
             <ClinicCard
               name={item.name}
               address={item.address}
-              etr={item.etr}
+              key={item.name + item.address}
+              // etr={item.etr}
+              etr={15}
               selected={this.state.selectedClinic === index}
               onPress={() => {
                 console.log("ClinicCard onPress called with index: ", index);
                 this.setState({ selectedClinic: index });
                 this.props.navigation.navigate("ClinicDetail", {
-                  title: mockClinicData[index].name
+                  title: clinics[index].name
                 });
               }}
             />
@@ -150,7 +155,8 @@ class Explore extends React.Component<Props, State> {
 
 const mapStateToProps = (state: any) => {
   return {
-    data: state
+    data: state,
+    clinics: state.clinics.clinicsNearBy
   };
 };
 

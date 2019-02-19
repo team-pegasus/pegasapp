@@ -1,0 +1,50 @@
+Random Stuff
+
+Possible colours on login page: 
+
+// colors={["#0F2027", "#203A43", "#2C5364"]}
+// colors={["#0f0c29", "#302b63", "#24243e"]}
+// colors={["#192f6a", "#3b5998"]}
+// colors={["#000428", "#004e92"]}
+            
+// backgroundColor: "#0A0D32"
+
+
+const mockClinicData = [
+  {
+    name: "Waterloo Walk-In",
+    address: "170 University Ave. W",
+    etr: 15,
+    coords: {
+      latitude: 43.4723,
+      longitude: -80.5449,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421
+    },
+    key: "ww170"
+  },
+  {
+    name: "Spruce Medical",
+    address: "318 Spruce St.",
+    etr: 30,
+    coords: {
+      latitude: 43.4766,
+      longitude: -80.5455,
+      latitudeDelta: 0.092,
+      longitudeDelta: 0.042
+    },
+    key: "sm318"
+  },
+  {
+    name: "Waterloo Onyx",
+    address: "280 Lester St.",
+    etr: 50,
+    coords: {
+      latitude: 43.48,
+      longitude: -80.52,
+      latitudeDelta: 0.093,
+      longitudeDelta: 0.041
+    },
+    key: "wo380"
+  }
+];

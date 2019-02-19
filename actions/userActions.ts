@@ -1,5 +1,5 @@
 import { userConstants } from "../constants";
-import { userService } from "../services/userService";
+import { userService } from "../services";
 import { UserRegistrationFields, SignupSuccessResponse } from "../types";
 
 const register = (user: UserRegistrationFields) => {

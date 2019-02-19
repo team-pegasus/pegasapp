@@ -7,7 +7,7 @@ import { FontAwesome } from "@expo/vector-icons"; //https://expo.github.io/vecto
 import { LinearGradient } from "expo";
 
 import { connect } from "react-redux";
-import { userActions } from "../../actions/userActions";
+import { userActions } from "../../actions";
 
 export interface Props {
   navigation: any;
@@ -20,6 +20,11 @@ export class Login extends React.Component<Props> {
   static navigationOptions = {
     header: null
   };
+
+  constructor(props: Props) {
+    super(props);
+    if (props.loggedIn) this.navigateToLoggedInExperience();
+  }
 
   componentWillReceiveProps(props: Props) {
     console.log("component receiving props: ", props);

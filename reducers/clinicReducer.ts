@@ -1,14 +1,14 @@
 import { clinicConstants } from "../constants";
 
 const INITIAL_STATE = {
-  clinics: [],
+  clinicsNearBy: [],
   isFetching: false,
   isError: false
 };
 
 const clinicReducer = (state = INITIAL_STATE, action: any) => {
   switch (action.type) {
-    case clinicConstants.FETCH_CLINICS:
+    case clinicConstants.FETCH_CLINICS_REQUEST:
       return Object.assign({}, state, {
         isFetching: true,
         clinics: {},
@@ -16,7 +16,7 @@ const clinicReducer = (state = INITIAL_STATE, action: any) => {
       });
     case clinicConstants.FETCH_CLINICS_SUCCESS:
       return Object.assign({}, state, {
-        userData: action.data,
+        clinicsNearBy: action.data,
         isFetching: false,
         isError: false
       });

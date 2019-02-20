@@ -1,5 +1,12 @@
 import React from "react";
-import { View, FlatList, Text, StatusBar } from "react-native";
+import {
+  View,
+  FlatList,
+  Text,
+  StatusBar,
+  TouchableOpacity,
+  Image
+} from "react-native";
 import { MapView, Location, Permissions } from "expo";
 
 import SearchBar from "./components/SearchBar";
@@ -7,6 +14,7 @@ import ClinicCard from "./components/ClinicCard";
 
 import { connect } from "react-redux";
 import { clinicActions } from "../../actions";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
 export interface Props {
   navigation: any;
@@ -44,23 +52,26 @@ class Explore extends React.Component<Props, State> {
     clinics: []
   };
 
-  // componentWillMount() {
-  //   this._getLocationAsync();
-  // }
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
 
-  // _getLocationAsync = async () => {
-  //   let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== "granted") {
+      console.log("Explore: user denied permission for location");
+    }
 
-  //   if (status !== "granted") {
-  //     console.log("Explore: user denied permission for location");
-  //   }
+    let location = await Location.getCurrentPositionAsync({});
+    console.log("Explore: user's location is: ", location);
 
-  //   let location = await Location.getCurrentPositionAsync({});
-  //   console.log("Explore: user granted permission for location: ", location);
+    const lat = location.coords.latitude;
+    const lng = location.coords.longitude;
 
-  //   // location.coords = {speed, longitude, latitude, accuracy}
-  //   // this.setState({ location });
-  // };
+    this.props.dispatch(clinicActions.fetchClinicsByLatLong(lat, lng));
+    this.handleMapCenter(lat, lng);
+  };
+
+  currentLocationSearch = () => {
+    this._getLocationAsync();
+  };
 
   handleClinicFetch = () => {
     this.props.dispatch(clinicActions.fetchAllClinics());
@@ -73,14 +84,17 @@ class Explore extends React.Component<Props, State> {
 
   componentWillReceiveProps(props: Props) {
     if (props.clinics.length) {
-      this.handleMapCenter(props.clinics[0]);
+      this.handleMapCenter(
+        props.clinics[0].latitude,
+        props.clinics[0].longitude
+      );
     }
   }
 
-  handleMapCenter = (centerClinic: any) => {
+  handleMapCenter = (lat: number, lng: number) => {
     this.map.animateToRegion({
-      latitude: centerClinic.latitude || fallBackData.latitude,
-      longitude: centerClinic.longitude || fallBackData.longitude,
+      latitude: lat || fallBackData.latitude,
+      longitude: lng || fallBackData.longitude,
       latitudeDelta: fallBackData.latitudeDelta,
       longitudeDelta: fallBackData.longitudeDelta
     });
@@ -108,7 +122,6 @@ class Explore extends React.Component<Props, State> {
           ref={map => {
             this.map = map;
           }}
-          // initialRegion={mockClinicData[this.state.selectedClinic].coords}
           initialRegion={{
             latitude: clinics[0] ? clinics[0].latitude : fallBackData.latitude,
             longitude: clinics[0]
@@ -150,6 +163,32 @@ class Explore extends React.Component<Props, State> {
 
         <SearchBar onSearch={this.handleSearch} />
 
+        {/* CURRENT LOCATION COMPONENT */}
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            position: "absolute",
+            bottom: 270,
+            right: 20,
+            height: 50,
+            width: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 25,
+            shadowOffset: { width: 0, height: 0 },
+            shadowColor: "black",
+            shadowOpacity: 0.2,
+            elevation: 1
+          }}
+          onPress={this.currentLocationSearch}
+        >
+          <MaterialIcon
+            name="my-location"
+            size={20}
+            style={{ color: "black" }}
+          />
+        </TouchableOpacity>
+
         {clinics.length ? (
           <FlatList
             data={clinics}
@@ -183,7 +222,45 @@ class Explore extends React.Component<Props, State> {
             )}
           />
         ) : (
-          <Text>yoyo</Text>
+          <View
+            style={{
+              flexDirection: "column",
+              backgroundColor: "white",
+              marginHorizontal: 20,
+              shadowOffset: { width: 0, height: 0 },
+              shadowColor: "black",
+              shadowOpacity: 0.2,
+              elevation: 1,
+              marginBottom: 15,
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              left: 0,
+              height: 240,
+              borderRadius: 15,
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 10
+            }}
+          >
+            {/* <View style={{ flexDirection: "row", flex: 1 }}> */}
+            <Image
+              style={{ width: 80, height: 150 }}
+              source={require("../../assets/sad_doctor.png")}
+            />
+            <Text
+              style={{
+                fontFamily: "Futura-Medium",
+                marginHorizontal: 10,
+                flex: 1,
+                fontSize: 20,
+                textAlign: "center",
+                justifyContent: "center"
+              }}
+            >
+              Sorry, we couldn't find any clinics near you.
+            </Text>
+          </View>
         )}
       </View>
     );

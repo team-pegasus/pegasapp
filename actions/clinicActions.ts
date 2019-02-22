@@ -3,7 +3,7 @@ import { clinicService } from "../services";
 
 //TODO: remove
 const auth =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo0NiwiZXhwIjoxNTUwNjMxNzYwfQ.I7mk_O48xR5z_I-et0eHT9I6MI_kNxe2EYlnmXrhBDo";
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo0NiwiZXhwIjoxNTUwOTQ1MzQxfQ.ZeJAbNI2agZVuO15f3bmNOq0eYmuWAeW0rU0NgFe61M";
 
 const fetchRequest = () => {
   return { type: clinicConstants.FETCH_CLINICS_REQUEST };

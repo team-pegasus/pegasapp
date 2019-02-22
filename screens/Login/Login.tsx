@@ -50,8 +50,8 @@ export class Login extends React.Component<Props> {
 
         this.props.dispatch(
           userActions.register({
-            first_name: familyName,
-            last_name: givenName,
+            first_name: givenName,
+            last_name: familyName,
             email: email || "",
             password: id
           })

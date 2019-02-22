@@ -3,14 +3,20 @@ import { View, Keyboard, TouchableWithoutFeedback, Text } from "react-native";
 import FormInput from "../../shared_components/FormInput";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
+import { connect } from "react-redux";
+
+import { waitlistActions } from "../../actions";
 
 export interface Props {
   navigation: any;
+  firstName?: string;
+  lastName?: string;
+  dispatch: Function;
 }
 
 export interface State {}
 
-export default class CheckInForm extends React.Component<Props, State> {
+class CheckInForm extends React.Component<Props, State> {
   //@ts-ignore -- navigation options
   static navigationOptions = ({ navigation }) => {
     return {
@@ -31,6 +37,7 @@ export default class CheckInForm extends React.Component<Props, State> {
     this.props.navigation.navigate("PendingApproval", {
       title: "Waterloo Walk-In"
     });
+    // this.props.dispatch(waitlistActions.joinWaitlist());
   };
 
   public render() {
@@ -48,8 +55,14 @@ export default class CheckInForm extends React.Component<Props, State> {
                 shadowOpacity: 0.2
               }}
             >
-              <FormInput label={"FIRST NAME"} />
-              <FormInput label={"LAST NAME"} />
+              <FormInput
+                defaultValue={this.props.firstName}
+                label={"FIRST NAME"}
+              />
+              <FormInput
+                defaultValue={this.props.lastName}
+                label={"LAST NAME"}
+              />
               <FormInput label={"REASON FOR VISIT"} />>
               <ConfirmButton onPress={this.onFormSubmit}>
                 <Text style={{ color: "white" }}>CONFIRM</Text>
@@ -61,6 +74,15 @@ export default class CheckInForm extends React.Component<Props, State> {
     );
   }
 }
+
+const mapStateToProps = (state: any) => {
+  return {
+    firstName: state.user.firstName,
+    lastName: state.user.lastName
+  };
+};
+
+export default connect(mapStateToProps)(CheckInForm);
 
 const ConfirmButton = styled.TouchableOpacity`
   background-color: #7BCC2A;

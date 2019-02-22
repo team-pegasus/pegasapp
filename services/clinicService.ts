@@ -36,6 +36,7 @@ const fetchClinicsByAddress = (authToken: string, address: string) => {
 const fetchClinics = (requestOptions: Object) => {
   return fetch(`${apiUrl}/clinics`, requestOptions)
     .then((response: any) => {
+      console.log("clinicService: fetchClinics response: ", response);
       return response.json();
     })
     .then((data: any) => {

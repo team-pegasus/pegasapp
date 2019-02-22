@@ -3,6 +3,7 @@ import { View, Text, TextInput } from "react-native";
 
 export interface Props {
   label: string;
+  defaultValue?: string;
   labelColor?: string;
   textColor?: string;
   borderColor?: string;
@@ -16,6 +17,7 @@ const FormInput = (props: Props) => {
   const {
     label,
     borderColor,
+    defaultValue,
     labelColor,
     textColor,
     onChangeText,
@@ -39,6 +41,7 @@ const FormInput = (props: Props) => {
           fontSize: 20,
           color: textColor || "black"
         }}
+        defaultValue={defaultValue || ""}
         onChangeText={onChangeText}
         secureTextEntry={password}
       />

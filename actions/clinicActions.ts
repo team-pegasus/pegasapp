@@ -1,10 +1,6 @@
 import { clinicConstants } from "../constants";
 import { clinicService } from "../services";
 
-//TODO: remove
-const auth =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo0NiwiZXhwIjoxNTUwOTQ1MzQxfQ.ZeJAbNI2agZVuO15f3bmNOq0eYmuWAeW0rU0NgFe61M";
-
 const fetchRequest = () => {
   return { type: clinicConstants.FETCH_CLINICS_REQUEST };
 };
@@ -16,10 +12,10 @@ const fetchFailure = (error: string) => {
 };
 
 export const fetchClinicsByLatLong = (lat: number, lng: number) => {
-  return (dispatch: Function) => {
+  return (dispatch: Function, getState: Function) => {
     dispatch(fetchRequest());
     clinicService
-      .fetchClinicsByLatLong(/*pass in auth token*/ auth, lat, lng)
+      .fetchClinicsByLatLong(getState().user.authToken, lat, lng)
       .then((response: any) => {
         console.log(
           "clinicActions: fetched all clinics by lat/long successfully: ",
@@ -35,10 +31,10 @@ export const fetchClinicsByLatLong = (lat: number, lng: number) => {
 };
 
 export const fetchClinicsByAddress = (address: string) => {
-  return (dispatch: Function) => {
+  return (dispatch: Function, getState: Function) => {
     dispatch(fetchRequest());
     clinicService
-      .fetchClinicsByAddress(/*pass in auth token*/ auth, address)
+      .fetchClinicsByAddress(getState().user.authToken, address)
       .then((response: any) => {
         console.log(
           "clinicActions: fetched all clinics by address successfully: ",
@@ -54,10 +50,10 @@ export const fetchClinicsByAddress = (address: string) => {
 };
 
 export const fetchAllClinics = () => {
-  return (dispatch: Function) => {
+  return (dispatch: Function, getState: Function) => {
     dispatch(fetchRequest());
     clinicService
-      .fetchAllClinics(/*pass in auth token*/ auth)
+      .fetchAllClinics(getState().user.authToken)
       .then((response: any) => {
         console.log(
           "clinicActions: fetched all clinics successfully: ",

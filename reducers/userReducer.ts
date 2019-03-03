@@ -26,6 +26,11 @@ const userReducer = (state: Object = INITIAL_STATE, action: any) => {
       };
     case userConstants.REGISTER_FAILURE:
       return { ...state, loggedIn: false, isLoading: false };
+    case userConstants.LOGIN_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
     case userConstants.LOGIN_SUCCESS:
       return {
         ...state,

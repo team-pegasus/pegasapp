@@ -15,6 +15,9 @@ const signup = (user: UserRegistrationFields) => {
       return response.json();
     })
     .then((data: SignupSuccessResponse) => {
+      console.log("userService: signup response: ", data);
+      if (data.message === "Validation failed: Email has already been taken")
+        throw "Try signing in instead!";
       if (!data.auth_token) throw "Signup failed!";
       return data;
     });
@@ -33,6 +36,8 @@ const login = (user: UserRegistrationFields) => {
     })
     .then((data: any) => {
       console.log("login data: ", data);
+      if (!data.auth_token) throw "Login failed!";
+      return data;
     });
 };
 

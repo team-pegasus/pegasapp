@@ -2,10 +2,6 @@ import { waitlistConstants } from "../constants";
 import { waitlistService } from "../services";
 import { JoinWaitlistFields, JoinWaitlistResponse } from "../types";
 
-//TODO: remove
-const auth =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo0NiwiZXhwIjoxNTUwOTQ1MzQxfQ.ZeJAbNI2agZVuO15f3bmNOq0eYmuWAeW0rU0NgFe61M";
-
 const joinWaitlist = (formData: JoinWaitlistFields) => {
   const request = (formData: JoinWaitlistFields) => {
     return { type: waitlistConstants.JOIN_WAITLIST_REQUEST, formData };

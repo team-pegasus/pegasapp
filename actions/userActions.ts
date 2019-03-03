@@ -29,7 +29,11 @@ const register = (user: UserRegistrationFields) => {
       })
       .catch(err => {
         console.log("registration error: ", err);
-        dispatch(failure(err.toString()));
+        if (err === "Try signing in instead!") {
+          dispatch(login(user));
+        } else {
+          dispatch(failure(err.toString()));
+        }
       });
   };
 };
@@ -38,24 +42,31 @@ const login = (user: UserRegistrationFields) => {
   const request = (user: UserRegistrationFields) => {
     return { type: userConstants.LOGIN_REQUEST, user };
   };
-  const success = (user: UserRegistrationFields) => {
+  const success = (user: Object) => {
     return { type: userConstants.LOGIN_SUCCESS, user };
   };
-  const failure = (error: UserRegistrationFields) => {
+  const failure = (error: Object) => {
     return { type: userConstants.LOGIN_FAILURE, error };
   };
 
   return (dispatch: Function) => {
     dispatch(request(user));
-
-    userService.login(user).then(
-      user => {
-        dispatch(success(user));
-      },
-      error => {
-        dispatch(failure(error.toString()));
-      }
-    );
+    userService
+      .login(user)
+      .then((response: SignupSuccessResponse) => {
+        const userData = {
+          firstName: user.first_name,
+          lastName: user.last_name,
+          email: user.email,
+          authToken: response.auth_token
+        };
+        console.log("Logged in successfully: ", userData);
+        dispatch(success(userData));
+      })
+      .catch(err => {
+        console.log("login error: ", err);
+        dispatch(failure(err.toString()));
+      });
   };
 };
 

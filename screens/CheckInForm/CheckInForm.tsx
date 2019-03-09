@@ -20,7 +20,7 @@ class CheckInForm extends React.Component<Props, State> {
   //@ts-ignore -- navigation options
   static navigationOptions = ({ navigation }) => {
     return {
-      title: "Waterloo Walk-In",
+      title: `${navigation.state.params.title}`,
       headerTitleStyle: { textAlign: "center", alignSelf: "center" },
       headerStyle: {
         backgroundColor: "white"

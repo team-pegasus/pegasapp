@@ -215,7 +215,8 @@ class Explore extends React.Component<Props, State> {
                   console.log("ClinicCard onPress called with index: ", index);
                   this.setState({ selectedClinic: index });
                   this.props.navigation.navigate("ClinicDetail", {
-                    title: clinics[index].name
+                    title: clinics[index].name,
+                    clinicIndex: index
                   });
                 }}
               />

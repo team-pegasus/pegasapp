@@ -1,14 +1,22 @@
-import React, { Component } from "react";
-import { View, ScrollView, Text } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
+import * as React from "react";
+import { View, ScrollView, Text, TouchableOpacity } from "react-native";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  FontAwesome
+} from "@expo/vector-icons"; //https://expo.github.io/vector-icons/
 //@ts-ignore -- RN styled components arent' typed
+import { Linking } from "expo";
 import styled from "styled-components/native";
+import { connect } from "react-redux";
 
 export interface Props {
   navigation: any;
+  // clinicIndex?: number;
+  clinic: any;
 }
 
-class ClinicDetail extends Component<Props> {
+class ClinicDetail extends React.Component<Props> {
   static defaultProps = {};
 
   //@ts-ignore -- navigation options
@@ -24,21 +32,46 @@ class ClinicDetail extends Component<Props> {
 
   onCheckInPress = () => {
     this.props.navigation.navigate("CheckInForm", {
-      title: "yoyoyo"
+      title: `${this.props.navigation.state.params.title}`
     });
   };
 
+  onPhoneNumberPress = (number: string) => {
+    console.log("number: ", number);
+    Linking.canOpenURL(`tel:${number}`)
+      .then((supported: boolean) => {
+        if (!supported) {
+          console.log("Can't handle number: " + number);
+          return;
+        }
+        return Linking.openURL(`tel:${number}`);
+      })
+      .catch(err => console.error("An error occurred", err));
+  };
+
+  twentyFourToTwelveHour = (t: string) => {
+    // Check correct time format and split into components
+    let time = t
+      .toString()
+      .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [t];
+
+    if (time.length > 1) {
+      // If time format correct
+      time = time.slice(1); // Remove full string match value
+      time[5] = +time[0] < 12 ? " AM" : " PM"; // Set AM/PM
+      //@ts-ignore -- navigation options
+      time[0] = +time[0] % 12 || 12; // Adjust hours
+    }
+    return time.join(""); // return adjusted time or original string
+  };
+
+  hoursOfOperationTo12Hours = (hOfOp: string) => {
+    const regex = /([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/g;
+    return hOfOp.replace(regex, this.twentyFourToTwelveHour);
+  };
+
   render() {
-    //index 0 == monday
-    const hoursOfOperation = [
-      { start: 9, end: 20 },
-      { start: 10, end: 21 },
-      { start: 9, end: 20 },
-      { start: 10, end: 21 },
-      { start: 9, end: 20 },
-      { start: 10, end: 16 },
-      { start: 10, end: 16 }
-    ];
+    console.log("clinic detail test: ", this.props.clinic);
 
     const daysOfWeek = [
       "Monday",
@@ -58,9 +91,11 @@ class ClinicDetail extends Component<Props> {
 
     const mockServices = ["Pharmacy", "Kid Friendly", "Accessible"];
 
+    const clinic = this.props.clinic;
+
     return (
       <ScrollView style={{ backgroundColor: "white", flex: 1 }}>
-        //CHECK IN CARD
+        //CHECK IN CARD --------------------------------------------------
         <View
           style={{
             backgroundColor: "white",
@@ -101,7 +136,7 @@ class ClinicDetail extends Component<Props> {
             <Text style={{ color: "white" }}>CHECK-IN</Text>
           </CheckInButton>
         </View>
-        //RATINGS AND OPEN
+        //RATINGS AND OPEN --------------------------------------------------
         <View
           style={{
             flexDirection: "row",
@@ -121,7 +156,22 @@ class ClinicDetail extends Component<Props> {
               alignItems: "center"
             }}
           >
-            <Text>S: 9:00am - 8:00pm</Text>
+            <TouchableOpacity
+              onPress={this.onPhoneNumberPress.bind(this, clinic.phone)}
+              style={{ flexDirection: "row" }}
+            >
+              <FontAwesome
+                name="phone"
+                size={16}
+                color="purple"
+                style={{ marginRight: 10 }}
+              />
+              <Text
+                style={{ color: "purple", textDecorationLine: "underline" }}
+              >
+                {clinic.phone}
+              </Text>
+            </TouchableOpacity>
           </View>
           <View
             style={{
@@ -136,28 +186,42 @@ class ClinicDetail extends Component<Props> {
               alignItems: "center"
             }}
           >
-            <Text>OPEN NOW</Text>
+            <Text style={{ fontWeight: "bold", color: "#7bcc2a" }}>
+              OPEN NOW
+            </Text>
           </View>
         </View>
-        //HOURS OF OPERATION
+        //HOURS OF OPERATION --------------------------------------------------
         <View style={{ padding: 20 }}>
-          {hoursOfOperation.map((hours, index) => {
-            const start = hours.start % 12;
-            const startSuffix = hours.start >= 12 ? "pm" : "am";
-            const end = hours.end % 12;
-            const endSuffix = hours.end >= 12 ? "pm" : "am";
+          <Text style={{ marginBottom: 10, color: "grey" }}>
+            HOURS OF OPERATION
+          </Text>
+          {daysOfWeek.map((day: string) => {
             return (
-              <Text
-                key={daysOfWeek[index]}
-                style={{ fontSize: 16, marginTop: 3 }}
-              >
-                {daysOfWeek[index]}: {start}:00{startSuffix} - {end}:00
-                {endSuffix}
-              </Text>
+              <View style={{ marginTop: 3, flexDirection: "row" }} key={day}>
+                <Text style={{ fontSize: 16 }}>
+                  {day}
+                  {": "}
+                  {clinic.hours_of_operation[day].length
+                    ? clinic.hours_of_operation[day].map(
+                        (hOp: string, index: number) => {
+                          return index ==
+                            clinic.hours_of_operation[day].length - 1
+                            ? this.hoursOfOperationTo12Hours(
+                                clinic.hours_of_operation[day][index]
+                              )
+                            : this.hoursOfOperationTo12Hours(
+                                clinic.hours_of_operation[day][index]
+                              ) + ", ";
+                        }
+                      )
+                    : "Closed"}
+                </Text>
+              </View>
             );
           })}
         </View>
-        //REVIEWS
+        //REVIEWS --------------------------------------------------
         <View
           style={{
             borderWidth: 1,
@@ -203,7 +267,7 @@ class ClinicDetail extends Component<Props> {
             </View>
           </View>
         </View>
-        //SERVICES
+        //SERVICES --------------------------------------------------
         <View
           style={{
             flexDirection: "row",
@@ -235,8 +299,9 @@ class ClinicDetail extends Component<Props> {
   }
 }
 
+// background-color: #0ab20a;
 const Circle = styled.View`
-  background-color: #0ab20a;
+  background-color: #7bcc2a;
   width: 10px;
   height: 10px;
   border-radius: 5px;
@@ -244,6 +309,7 @@ const Circle = styled.View`
 
 const CheckInButton = styled.TouchableOpacity`
   background-color: #7bcc2a;
+  width: 10px;
   border-radius: 5px;
   width: auto;
   align-items: center;
@@ -251,4 +317,12 @@ const CheckInButton = styled.TouchableOpacity`
   margin-top: 15px;
 `;
 
-export default ClinicDetail;
+const mapStateToProps = (state: any, props: Props) => {
+  console.log("clinicIndex: ", props.navigation.state.params);
+  return {
+    clinic:
+      state.clinics.clinicsNearBy[props.navigation.state.params.clinicIndex]
+  };
+};
+
+export default connect(mapStateToProps)(ClinicDetail);

@@ -1,10 +1,19 @@
 {
   "expo": {
+    "name": "MedCare",
+    "icon": "./assets/pegasus.png",
+    "version": "1.0.0",
+    "slug": "pegasus-medcare",
     "sdkVersion": "27.0.0",
+    "ios": {
+      "bundleIdentifier": "com.luminouslabs.medcare"
+    },
     "packagerOpts": {
       "sourceExts": ["ts", "tsx"],
       "transformer": "node_modules/react-native-typescript-transformer/index.js"
-    }
+    },
+    "description": "Wait times at walk-in clinics in Canada",
+    "githubUrl": "https://github.com/team-pegasus/pegasapp"
   },
   "facebookScheme": "fb2379249225690629",
   "facebookAppId": "2379249225690629",

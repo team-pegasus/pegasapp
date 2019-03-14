@@ -3,7 +3,9 @@ import { Alert, View, Keyboard, Text } from "react-native";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
 
-export interface Props {}
+export interface Props {
+  navigation: any;
+}
 
 export interface State {}
 
@@ -16,7 +18,9 @@ export default class QueueStatus extends React.Component<Props, State> {
       headerTitleStyle: { textAlign: "center", alignSelf: "center" },
       headerStyle: {
         backgroundColor: "white"
-      }
+      },
+      headerLeft: null,
+      gesturesEnabled: false
     };
   };
 
@@ -29,10 +33,18 @@ export default class QueueStatus extends React.Component<Props, State> {
     Alert.alert("Are you sure?", "You will forfeit your position in queue", [
       {
         text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
+        onPress: () => {
+          console.log("Cancel Pressed");
+        },
         style: "cancel"
       },
-      { text: "Yes", onPress: () => console.log("OK Pressed") }
+      {
+        text: "Yes",
+        onPress: () => {
+          console.log("OK Pressed");
+          this.props.navigation.navigate("Explore", {});
+        }
+      }
     ]);
   };
 
@@ -54,7 +66,7 @@ export default class QueueStatus extends React.Component<Props, State> {
             <View style={{ flexDirection: "row" }}>
               <Text style={{ color: "grey" }}>WAIT TIME</Text>
             </View>
-            <Text style={{ fontSize: 24 }}>~ 12 minutes</Text>
+            <Text style={{ fontSize: 24 }}>~ 15 minutes</Text>
           </View>
           <LeaveQueueButton onPress={this.showAlert}>
             <Text style={{ color: "white" }}>LEAVE QUEUE</Text>

@@ -34,7 +34,8 @@ class CheckInForm extends React.Component<Props, State> {
   }
 
   onFormSubmit = () => {
-    this.props.navigation.navigate("PendingApproval", {
+    // this.props.navigation.navigate("PendingApproval", {
+    this.props.navigation.navigate("QueueStatus", {
       title: "Waterloo Walk-In"
     });
     // this.props.dispatch(waitlistActions.joinWaitlist());

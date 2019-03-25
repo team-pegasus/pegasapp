@@ -9,15 +9,40 @@ import {
 import { Linking } from "expo";
 import styled from "styled-components/native";
 import { connect } from "react-redux";
+import { hoursOfOperationTo12Hours } from "../../helpers/time";
 
 export interface Props {
   navigation: any;
   // clinicIndex?: number;
   clinic: any;
+  inQueue: boolean;
 }
 
+const getRandomInt = (max: number) => {
+  return Math.floor(Math.random() * Math.floor(max));
+};
+
+const randomizeRating = () => {
+  return getRandomInt(3) + 2;
+};
+
+const getStarsArr = (rating: number) => {
+  const stars = [0, 0, 0, 0, 0];
+  for (let i = 0; i < rating; i++) {
+    stars[i] = 1;
+  }
+  return stars;
+};
+
 class ClinicDetail extends React.Component<Props> {
+  rating: number;
+
   static defaultProps = {};
+
+  constructor(props: Props) {
+    super(props);
+    this.rating = randomizeRating();
+  }
 
   //@ts-ignore -- navigation options
   static navigationOptions = ({ navigation }) => {
@@ -31,9 +56,12 @@ class ClinicDetail extends React.Component<Props> {
   };
 
   onCheckInPress = () => {
-    this.props.navigation.navigate("CheckInForm", {
-      title: `${this.props.navigation.state.params.title}`
-    });
+    if (!this.props.inQueue) {
+      this.props.navigation.navigate("CheckInForm", {
+        title: this.props.navigation.state.params.title,
+        clinicId: this.props.navigation.state.params.clinicId
+      });
+    }
   };
 
   onPhoneNumberPress = (number: string) => {
@@ -47,27 +75,6 @@ class ClinicDetail extends React.Component<Props> {
         return Linking.openURL(`tel:${number}`);
       })
       .catch(err => console.error("An error occurred", err));
-  };
-
-  twentyFourToTwelveHour = (t: string) => {
-    // Check correct time format and split into components
-    let time = t
-      .toString()
-      .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [t];
-
-    if (time.length > 1) {
-      // If time format correct
-      time = time.slice(1); // Remove full string match value
-      time[5] = +time[0] < 12 ? " AM" : " PM"; // Set AM/PM
-      //@ts-ignore -- navigation options
-      time[0] = +time[0] % 12 || 12; // Adjust hours
-    }
-    return time.join(""); // return adjusted time or original string
-  };
-
-  hoursOfOperationTo12Hours = (hOfOp: string) => {
-    const regex = /([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/g;
-    return hOfOp.replace(regex, this.twentyFourToTwelveHour);
   };
 
   render() {
@@ -92,6 +99,14 @@ class ClinicDetail extends React.Component<Props> {
     const mockServices = ["Pharmacy", "Kid Friendly", "Accessible"];
 
     const clinic = this.props.clinic;
+    const etr = clinic.curr_wait_time;
+
+    let etrColour = "#7bcc2a";
+    if (etr && etr > 20 && etr < 40) {
+      etrColour = "orange";
+    } else if (etr && etr >= 40) {
+      etrColour = "red";
+    }
 
     return (
       <ScrollView style={{ backgroundColor: "white", flex: 1 }}>
@@ -127,13 +142,20 @@ class ClinicDetail extends React.Component<Props> {
                 <Text style={{ color: "grey", fontSize: 15, marginRight: 5 }}>
                   WAIT TIME
                 </Text>
-                <Circle />
+                <Circle color={etrColour} />
               </View>
-              <Text style={{ fontSize: 20 }}>15 minutes</Text>
+              <Text style={{ fontSize: 20 }}>
+                {clinic.curr_wait_time} minutes
+              </Text>
             </View>
           </View>
-          <CheckInButton onPress={this.onCheckInPress}>
-            <Text style={{ color: "white" }}>CHECK-IN</Text>
+          <CheckInButton
+            onPress={this.onCheckInPress}
+            color={this.props.inQueue ? "#85878c" : etrColour}
+          >
+            <Text style={{ color: "white" }}>
+              {this.props.inQueue ? "Already in Queue" : "CHECK-IN"}
+            </Text>
           </CheckInButton>
         </View>
         //RATINGS AND OPEN --------------------------------------------------
@@ -202,20 +224,22 @@ class ClinicDetail extends React.Component<Props> {
                 <Text style={{ fontSize: 16 }}>
                   {day}
                   {": "}
-                  {clinic.hours_of_operation[day].length
-                    ? clinic.hours_of_operation[day].map(
-                        (hOp: string, index: number) => {
-                          return index ==
-                            clinic.hours_of_operation[day].length - 1
-                            ? this.hoursOfOperationTo12Hours(
-                                clinic.hours_of_operation[day][index]
-                              )
-                            : this.hoursOfOperationTo12Hours(
-                                clinic.hours_of_operation[day][index]
-                              ) + ", ";
-                        }
-                      )
-                    : "Closed"}
+                  {clinic.hours_of_operation
+                    ? clinic.hours_of_operation[day].length
+                      ? clinic.hours_of_operation[day].map(
+                          (hOp: string, index: number) => {
+                            return index ==
+                              clinic.hours_of_operation[day].length - 1
+                              ? hoursOfOperationTo12Hours(
+                                  clinic.hours_of_operation[day][index]
+                                )
+                              : hoursOfOperationTo12Hours(
+                                  clinic.hours_of_operation[day][index]
+                                ) + ", ";
+                          }
+                        )
+                      : "Closed"
+                    : "Unknown"}
                 </Text>
               </View>
             );
@@ -247,14 +271,16 @@ class ClinicDetail extends React.Component<Props> {
                 textAlign: "center"
               }}
             >
-              12 reviews
+              {getRandomInt(50) + 2} reviews
             </Text>
             <View
               style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
             >
-              <Text style={{ marginRight: 5 }}>3.2</Text>
-              //HACKY
-              {[1, 1, 1, 0, 0].map((num, idx) => {
+              <Text style={{ marginRight: 5 }}>
+                {this.rating}.{getRandomInt(37) + 10}
+              </Text>
+              //HACKY, TODO: unhardcode this
+              {getStarsArr(this.rating).map((num, idx) => {
                 return (
                   <Ionicons
                     name="md-star"
@@ -299,16 +325,15 @@ class ClinicDetail extends React.Component<Props> {
   }
 }
 
-// background-color: #0ab20a;
 const Circle = styled.View`
-  background-color: #7bcc2a;
+  background-color: ${props => props.color};
   width: 10px;
   height: 10px;
   border-radius: 5px;
 `;
 
 const CheckInButton = styled.TouchableOpacity`
-  background-color: #7bcc2a;
+  background-color: ${props => props.color};
   width: 10px;
   border-radius: 5px;
   width: auto;
@@ -321,7 +346,8 @@ const mapStateToProps = (state: any, props: Props) => {
   console.log("clinicIndex: ", props.navigation.state.params);
   return {
     clinic:
-      state.clinics.clinicsNearBy[props.navigation.state.params.clinicIndex]
+      state.clinics.clinicsNearBy[props.navigation.state.params.clinicIndex],
+    inQueue: state.waitlist.inQueue
   };
 };
 

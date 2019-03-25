@@ -38,13 +38,31 @@ export default class LoginWithEmail extends React.Component<Props, State> {
     let title = (
       <View
         style={{
-          flex: 0.75,
+          flex: 1,
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
+          flexDirection: "row"
         }}
       >
-        <Text style={{ fontSize: 35, color: "white", fontWeight: "400" }}>
-          MedCare
+        <Text
+          style={{
+            fontSize: 50,
+            color: "white",
+            fontWeight: "100",
+            fontFamily: "OriyaSangamMN"
+          }}
+        >
+          WALK
+        </Text>
+        <Text
+          style={{
+            fontSize: 50,
+            color: "#63c6ff",
+            fontWeight: "100",
+            fontFamily: "OriyaSangamMN"
+          }}
+        >
+          IN
         </Text>
       </View>
     );

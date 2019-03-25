@@ -12,9 +12,12 @@ export interface Props {
   firstName?: string;
   lastName?: string;
   dispatch: Function;
+  inQueue: boolean;
 }
 
-export interface State {}
+export interface State {
+  reason: string;
+}
 
 class CheckInForm extends React.Component<Props, State> {
   //@ts-ignore -- navigation options
@@ -30,15 +33,35 @@ class CheckInForm extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {};
+    this.state = {
+      reason: ""
+    };
+  }
+
+  componentWillReceiveProps(props: Props) {
+    if (props.inQueue) {
+      this.props.navigation.navigate("QueueStatus", {
+        title: this.props.navigation.state.params.title
+      });
+    }
   }
 
   onFormSubmit = () => {
-    // this.props.navigation.navigate("PendingApproval", {
-    this.props.navigation.navigate("QueueStatus", {
-      title: "Waterloo Walk-In"
-    });
-    // this.props.dispatch(waitlistActions.joinWaitlist());
+    this.props.dispatch(
+      waitlistActions.joinWaitlist(
+        this.props.navigation.state.params.clinicId,
+        {
+          first_name: this.props.firstName,
+          last_name: this.props.lastName,
+          reason: this.state.reason
+        }
+      )
+    );
+  };
+
+  onReasonChange = (newReason: string) => {
+    console.log("new reason is: ", newReason);
+    this.setState({ reason: newReason });
   };
 
   public render() {
@@ -64,7 +87,10 @@ class CheckInForm extends React.Component<Props, State> {
                 defaultValue={this.props.lastName}
                 label={"LAST NAME"}
               />
-              <FormInput label={"REASON FOR VISIT"} />>
+              <FormInput
+                label={"REASON FOR VISIT"}
+                onChangeText={this.onReasonChange}
+              />
               <ConfirmButton onPress={this.onFormSubmit}>
                 <Text style={{ color: "white" }}>CONFIRM</Text>
               </ConfirmButton>
@@ -79,7 +105,8 @@ class CheckInForm extends React.Component<Props, State> {
 const mapStateToProps = (state: any) => {
   return {
     firstName: state.user.firstName,
-    lastName: state.user.lastName
+    lastName: state.user.lastName,
+    inQueue: state.waitlist.inQueue
   };
 };
 

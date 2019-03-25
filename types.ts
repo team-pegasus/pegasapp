@@ -11,9 +11,16 @@ export type JoinWaitlistFields = {
   reason: string;
 };
 
-export type JoinWaitlistResponse = {
-  message: string;
-  wait_time: number;
+export type JoinWaitlistResponse = [
+  {
+    id: number;
+    checked_in: boolean;
+  }
+];
+
+export type GetWaitTimeResponse = {
+  position: number;
+  wait: number;
 };
 
 export type SignupSuccessResponse = {

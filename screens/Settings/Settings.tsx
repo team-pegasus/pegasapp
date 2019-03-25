@@ -1,5 +1,12 @@
 import * as React from "react";
-import { View, Text, Button, TouchableOpacity, StatusBar } from "react-native";
+import {
+  View,
+  ScrollView,
+  Text,
+  Button,
+  TouchableOpacity,
+  StatusBar
+} from "react-native";
 import { connect } from "react-redux";
 import { userActions } from "../../actions/userActions";
 
@@ -13,11 +20,12 @@ export interface ListItemProps {
   last: boolean;
   text: string;
   onPress: any;
+  textColor: string;
 }
 
 class ListItem extends React.Component<ListItemProps> {
   render() {
-    const { first, last, text, onPress } = this.props;
+    const { first, last, text, onPress, textColor } = this.props;
     return (
       <TouchableOpacity onPress={onPress}>
         <View
@@ -34,11 +42,13 @@ class ListItem extends React.Component<ListItemProps> {
             style={{
               borderBottomWidth: last ? 0 : 1,
               borderColor: "#d3d3d3",
-              paddingVertical: 20,
+              paddingVertical: 15,
               flex: 1
             }}
           >
-            <Text style={{ fontSize: 16 }}>{text}</Text>
+            <Text style={{ fontSize: 16, color: textColor || "black" }}>
+              {text}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -55,15 +65,16 @@ class Settings extends React.Component<Props> {
   itemStrings = [
     { text: "My Profile Settings" },
     { text: "Edit Profile Picture" },
-    { text: "Push Notifications" },
-    { text: "Sign Out", onPress: this.signOutUser }
+    { text: "Push Notifications" }
   ];
 
   supportStrings = [{ text: "Report a Problem" }, { text: "Privacy Policy" }];
 
+  otherStrings = [{ text: "Log out", onPress: this.signOutUser }];
+
   render() {
     return (
-      <View
+      <ScrollView
         style={{ flex: 1, flexDirection: "column", backgroundColor: "#F4F2F1" }}
       >
         <StatusBar barStyle="dark-content" />
@@ -103,7 +114,20 @@ class Settings extends React.Component<Props> {
             onPress={item.onPress}
           />
         ))}
-      </View>
+        <Text style={{ fontSize: 20, padding: 20, color: "grey" }}>
+          General
+        </Text>
+        {this.otherStrings.map((item: any, idx: number) => (
+          <ListItem
+            first={idx == 0}
+            last={idx == this.otherStrings.length - 1}
+            key={item.text}
+            text={item.text}
+            onPress={item.onPress}
+            textColor={item.text === "Log out" ? "red" : "black"}
+          />
+        ))}
+      </ScrollView>
     );
   }
 }

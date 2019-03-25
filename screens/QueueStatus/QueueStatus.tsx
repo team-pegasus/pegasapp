@@ -1,20 +1,25 @@
 import * as React from "react";
-import { Alert, View, Keyboard, Text } from "react-native";
+import { Alert, View, Keyboard, Text, TouchableOpacity } from "react-native";
 //@ts-ignore -- RN styled components arent' typed
 import styled from "styled-components/native";
+import { waitlistActions } from "../../actions";
+import { connect } from "react-redux";
+import Ionicon from "react-native-vector-icons/Ionicons";
 
 export interface Props {
   navigation: any;
+  dispatch: Function;
+  currWaitTime: any;
+  clinicId: number;
 }
 
 export interface State {}
 
-export default class QueueStatus extends React.Component<Props, State> {
+class QueueStatus extends React.Component<Props, State> {
   //@ts-ignore -- navigation options
   static navigationOptions = ({ navigation }) => {
     return {
-      //   title: `${navigation.state.params.title}`,
-      title: "Waterloo Walk-In",
+      title: navigation.state.params.title,
       headerTitleStyle: { textAlign: "center", alignSelf: "center" },
       headerStyle: {
         backgroundColor: "white"
@@ -27,6 +32,10 @@ export default class QueueStatus extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {};
+  }
+
+  componentDidMount() {
+    this.props.dispatch(waitlistActions.getWaitTime());
   }
 
   showAlert = () => {
@@ -43,12 +52,17 @@ export default class QueueStatus extends React.Component<Props, State> {
         onPress: () => {
           console.log("OK Pressed");
           this.props.navigation.navigate("Explore", {});
+          this.props.dispatch(
+            waitlistActions.leaveWaitlist(this.props.clinicId)
+          );
         }
       }
     ]);
   };
 
-  public render() {
+  render() {
+    const { currWaitTime } = this.props;
+
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <View
@@ -66,7 +80,7 @@ export default class QueueStatus extends React.Component<Props, State> {
             <View style={{ flexDirection: "row" }}>
               <Text style={{ color: "grey" }}>WAIT TIME</Text>
             </View>
-            <Text style={{ fontSize: 24 }}>~ 15 minutes</Text>
+            <Text style={{ fontSize: 24 }}>~{currWaitTime.wait} minutes</Text>
           </View>
           <LeaveQueueButton onPress={this.showAlert}>
             <Text style={{ color: "white" }}>LEAVE QUEUE</Text>
@@ -76,6 +90,15 @@ export default class QueueStatus extends React.Component<Props, State> {
     );
   }
 }
+
+const mapStateToProps = (state: any) => {
+  return {
+    currWaitTime: state.waitlist.currWaitTime,
+    clinicId: state.waitlist.clinicId
+  };
+};
+
+export default connect(mapStateToProps)(QueueStatus);
 
 const LeaveQueueButton = styled.TouchableOpacity`
   background-color: orange;

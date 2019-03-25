@@ -11,7 +11,6 @@ const clinicReducer = (state = INITIAL_STATE, action: any) => {
     case clinicConstants.FETCH_CLINICS_REQUEST:
       return Object.assign({}, state, {
         isFetching: true,
-        clinics: {},
         isError: false
       });
     case clinicConstants.FETCH_CLINICS_SUCCESS:

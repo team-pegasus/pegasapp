@@ -8,7 +8,7 @@ export interface Props {
   textColor?: string;
   borderColor?: string;
   password?: boolean;
-  onChangeText?: (text: string) => {};
+  onChangeText?: (text: string) => void;
 }
 
 export interface State {}

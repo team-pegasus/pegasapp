@@ -162,18 +162,29 @@ export class Login extends React.Component<Props> {
         style={{
           flex: 1,
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
+          flexDirection: "row"
         }}
       >
         <Text
           style={{
-            fontSize: 50,
+            fontSize: 60,
             color: "white",
             fontWeight: "100",
-            fontFamily: "Futura-Medium"
+            fontFamily: "OriyaSangamMN"
           }}
         >
-          MedCare
+          WALK
+        </Text>
+        <Text
+          style={{
+            fontSize: 60,
+            color: "#63c6ff",
+            fontWeight: "100",
+            fontFamily: "OriyaSangamMN"
+          }}
+        >
+          IN
         </Text>
       </View>
     );

@@ -1,10 +1,37 @@
 import { apiUrl } from "../config";
-import { JoinWaitlistFields, JoinWaitlistResponse } from "../types";
+import {
+  JoinWaitlistFields,
+  JoinWaitlistResponse,
+  GetWaitTimeResponse
+} from "../types";
 
-const joinWaitlist = (clinicId: number, formData: JoinWaitlistFields) => {
+const leaveWaitlist = (authToken: string, clinicId: number) => {
+  const requestOptions = {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json", Authorization: authToken }
+  };
+
+  console.log("waitlistService: leaving waitlist");
+
+  return fetch(`${apiUrl}/waitlist/${clinicId}`, requestOptions)
+    .then((response: any) => {
+      return response.json();
+    })
+    .then((data: JoinWaitlistResponse) => {
+      console.log("LeaveWaitlistResponse: ", data);
+      if (!data) throw "Waitlist leave failed!";
+      return data;
+    });
+};
+
+const joinWaitlist = (
+  authToken: string,
+  clinicId: number,
+  formData: JoinWaitlistFields
+) => {
   const requestOptions = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Authorization: authToken },
     body: JSON.stringify(formData)
   };
 
@@ -15,11 +42,33 @@ const joinWaitlist = (clinicId: number, formData: JoinWaitlistFields) => {
       return response.json();
     })
     .then((data: JoinWaitlistResponse) => {
-      if (!data.wait_time) throw "Waitlist join failed!";
+      console.log("JoinWaitlistResponse: ", data);
+      if (!data.length) throw "Waitlist join failed!";
+      return data;
+    });
+};
+
+const getWaitTime = (authToken: string) => {
+  const requestOptions = {
+    method: "GET",
+    headers: { "Content-Type": "application/json", Authorization: authToken }
+  };
+
+  console.log("waitlistService: getting wait time...");
+
+  return fetch(`${apiUrl}/user/waitingtime`, requestOptions)
+    .then((response: any) => {
+      return response.json();
+    })
+    .then((data: GetWaitTimeResponse) => {
+      console.log("getWaitTime response: ", data);
+      if (!data.wait) throw "getWaitTime request failed";
       return data;
     });
 };
 
 export const waitlistService = {
-  joinWaitlist
+  joinWaitlist,
+  leaveWaitlist,
+  getWaitTime
 };

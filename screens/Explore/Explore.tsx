@@ -15,11 +15,13 @@ import ClinicCard from "./components/ClinicCard";
 import { connect } from "react-redux";
 import { clinicActions } from "../../actions";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import Ionicon from "react-native-vector-icons/Ionicons";
 
 export interface Props {
   navigation: any;
   clinics: Array<any>;
   dispatch: Function;
+  inQueue: boolean;
 }
 
 export interface State {
@@ -33,8 +35,19 @@ const fallBackData = {
   longitudeDelta: 0.05
 };
 
+const dayMappings = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday"
+];
+
 class Explore extends React.Component<Props, State> {
   map: any; // used as a ref for MapView
+  dayIndex: number;
 
   static navigationOptions = {
     header: null
@@ -45,11 +58,20 @@ class Explore extends React.Component<Props, State> {
     this.state = {
       selectedClinic: 0
     };
+
+    this.dayIndex = new Date().getDay();
     this.handleClinicFetch();
   }
 
+  componentDidMount() {
+    setInterval(() => {
+      this.handleClinicFetch();
+    }, 60000);
+  }
+
   static defaultProps = {
-    clinics: []
+    clinics: [],
+    inQueue: false
   };
 
   _getLocationAsync = async () => {
@@ -100,6 +122,13 @@ class Explore extends React.Component<Props, State> {
     });
   };
 
+  navigateToQueueStatus = () => {
+    this.props.navigation.navigate("QueueStatus", {
+      // title: this.props.navigation.state.params.title
+      title: "thoolaayyy"
+    });
+  };
+
   render() {
     const { clinics } = this.props;
     return (
@@ -145,7 +174,8 @@ class Explore extends React.Component<Props, State> {
               title="Waterloo Walk-In"
               description="Some description"
               key={clinic.name + clinic.address}
-              pinColor={this.state.selectedClinic === index ? "red" : "blue"}
+              // pinColor={this.state.selectedClinic === index ? "red" : "blue"}
+              pinColor={"blue"}
             >
               {/* bootleg way of ignoring ts error
               // @ts-ignore */}
@@ -161,7 +191,55 @@ class Explore extends React.Component<Props, State> {
           ))}
         </MapView>
 
-        <SearchBar onSearch={this.handleSearch} />
+        <SearchBar
+          marginTop={this.props.inQueue ? 70 : 50}
+          onSearch={this.handleSearch}
+        />
+
+        {/* QUEUE STATUS COMPONENT */}
+        {this.props.inQueue && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 50,
+              alignItems: "flex-end",
+              justifyContent: "center",
+              shadowOffset: { width: 0, height: 0 },
+              shadowColor: "black",
+              shadowOpacity: 0.2,
+              elevation: 1,
+              flexDirection: "row",
+              backgroundColor: "#7bcc2a",
+              paddingBottom: 5,
+              paddingHorizontal: 20
+            }}
+            onPress={this.navigateToQueueStatus}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                flex: 1
+              }}
+            >
+              <View style={{ marginRight: 10 }}>
+                <Text style={{ textAlign: "center", color: "white" }}>
+                  Currently in Queue
+                </Text>
+              </View>
+              <View>
+                <Ionicon
+                  name="ios-arrow-forward"
+                  size={20}
+                  style={{ color: "white" }}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
 
         {/* CURRENT LOCATION COMPONENT */}
         <TouchableOpacity
@@ -208,15 +286,20 @@ class Explore extends React.Component<Props, State> {
                 name={item.name}
                 address={item.address}
                 key={item.name + item.address}
-                // etr={item.etr}
-                etr={15}
+                hoursOfOperation={
+                  item.hours_of_operation &&
+                  item.hours_of_operation[dayMappings[this.dayIndex]]
+                }
+                //closed={index % 2 == 0} //TODO: set this to true when etr == nil or something
+                etr={item.curr_wait_time}
                 selected={this.state.selectedClinic === index}
                 onPress={() => {
                   console.log("ClinicCard onPress called with index: ", index);
                   this.setState({ selectedClinic: index });
                   this.props.navigation.navigate("ClinicDetail", {
                     title: clinics[index].name,
-                    clinicIndex: index
+                    clinicIndex: index,
+                    clinicId: item.id
                   });
                 }}
               />
@@ -271,7 +354,8 @@ class Explore extends React.Component<Props, State> {
 const mapStateToProps = (state: any) => {
   return {
     data: state,
-    clinics: state.clinics.clinicsNearBy
+    clinics: state.clinics.clinicsNearBy,
+    inQueue: state.waitlist.inQueue
   };
 };
 

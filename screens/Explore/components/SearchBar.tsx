@@ -12,6 +12,7 @@ import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
 export interface Props {
   onSearch: (query: string) => void;
+  marginTop?: number;
 }
 
 export interface State {
@@ -42,11 +43,23 @@ class SearchBar extends Component<Props, State> {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View
+        style={{
+          flexDirection: "row",
+          padding: 10,
+          backgroundColor: "white",
+          marginHorizontal: 20,
+          shadowOffset: { width: 0, height: 0 },
+          shadowColor: "black",
+          shadowOpacity: 0.2,
+          elevation: 1,
+          marginTop: this.props.marginTop || 50
+        }}
+      >
         <IonIcon name="ios-search" size={20} style={{ marginRight: 10 }} />
         <TextInput
           underlineColorAndroid="transparent"
-          placeholder="Waterloo, ON"
+          placeholder="e.g. Waterloo, ON"
           style={{ flex: 1, fontWeight: "700", backgroundColor: "white" }}
           returnKeyType="search"
           onFocus={this.onFocus}
@@ -69,17 +82,3 @@ class SearchBar extends Component<Props, State> {
   }
 }
 export default SearchBar;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    padding: 10,
-    backgroundColor: "white",
-    marginHorizontal: 20,
-    shadowOffset: { width: 0, height: 0 },
-    shadowColor: "black",
-    shadowOpacity: 0.2,
-    elevation: 1,
-    marginTop: 50
-  }
-});

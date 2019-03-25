@@ -20,6 +20,7 @@ import Ionicon from "react-native-vector-icons/Ionicons";
 export interface Props {
   navigation: any;
   clinics: Array<any>;
+  inQueueClinic: any;
   dispatch: Function;
   inQueue: boolean;
 }
@@ -60,10 +61,10 @@ class Explore extends React.Component<Props, State> {
     };
 
     this.dayIndex = new Date().getDay();
-    this.handleClinicFetch();
   }
 
   componentDidMount() {
+    this.handleClinicFetch();
     setInterval(() => {
       this.handleClinicFetch();
     }, 60000);
@@ -125,7 +126,7 @@ class Explore extends React.Component<Props, State> {
   navigateToQueueStatus = () => {
     this.props.navigation.navigate("QueueStatus", {
       // title: this.props.navigation.state.params.title
-      title: "thoolaayyy"
+      title: this.props.inQueueClinic.name
     });
   };
 
@@ -298,8 +299,7 @@ class Explore extends React.Component<Props, State> {
                   this.setState({ selectedClinic: index });
                   this.props.navigation.navigate("ClinicDetail", {
                     title: clinics[index].name,
-                    clinicIndex: index,
-                    clinicId: item.id
+                    clinicIndex: index
                   });
                 }}
               />
@@ -353,9 +353,9 @@ class Explore extends React.Component<Props, State> {
 
 const mapStateToProps = (state: any) => {
   return {
-    data: state,
     clinics: state.clinics.clinicsNearBy,
-    inQueue: state.waitlist.inQueue
+    inQueue: state.waitlist.inQueue,
+    inQueueClinic: state.waitlist.clinic
   };
 };
 

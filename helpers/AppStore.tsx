@@ -7,7 +7,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { persistStore, persistReducer } from "redux-persist";
 
 const persistConfig = {
-  key: "rootsxx",
+  key: "rootsexy",
   storage: AsyncStorage
 };
 

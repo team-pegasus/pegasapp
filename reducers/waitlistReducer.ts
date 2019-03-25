@@ -1,7 +1,7 @@
 import { waitlistConstants } from "../constants";
 
 const INITIAL_WAITLIST_STATE = {
-  clinicId: -1,
+  clinic: {},
   currWaitTime: {},
   inQueue: false,
   isError: false,
@@ -12,19 +12,19 @@ const waitlistReducer = (state = INITIAL_WAITLIST_STATE, action: any) => {
   switch (action.type) {
     case waitlistConstants.JOIN_WAITLIST_REQUEST:
       return Object.assign({}, state, {
-        clinicId: -1,
+        clinic: {},
         isError: false
       });
     case waitlistConstants.JOIN_WAITLIST_SUCCESS:
       console.log("join_waitlist_success data: ", action.data);
       return Object.assign({}, state, {
-        clinicId: action.data.clinicId,
+        clinic: action.data.clinic,
         inQueue: true,
         isError: false
       });
     case waitlistConstants.JOIN_WAITLIST_FAILURE:
       return Object.assign({}, state, {
-        clinicId: -1,
+        clinic: {},
         isError: true
       });
     case waitlistConstants.LEAVE_WAITLIST_REQUEST:
@@ -33,7 +33,7 @@ const waitlistReducer = (state = INITIAL_WAITLIST_STATE, action: any) => {
       });
     case waitlistConstants.LEAVE_WAITLIST_SUCCESS:
       return Object.assign({}, state, {
-        clinicId: -1,
+        clinic: {},
         currWaitTime: {},
         inQueue: false,
         isError: false,

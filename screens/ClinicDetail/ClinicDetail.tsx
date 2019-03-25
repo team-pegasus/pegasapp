@@ -13,7 +13,6 @@ import { hoursOfOperationTo12Hours } from "../../helpers/time";
 
 export interface Props {
   navigation: any;
-  // clinicIndex?: number;
   clinic: any;
   inQueue: boolean;
 }
@@ -59,7 +58,7 @@ class ClinicDetail extends React.Component<Props> {
     if (!this.props.inQueue) {
       this.props.navigation.navigate("CheckInForm", {
         title: this.props.navigation.state.params.title,
-        clinicId: this.props.navigation.state.params.clinicId
+        clinicId: this.props.clinic.id
       });
     }
   };

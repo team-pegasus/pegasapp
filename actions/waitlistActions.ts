@@ -53,6 +53,11 @@ const joinWaitlist = (clinicId: number, formData: JoinWaitlistFields) => {
   );
 
   return (dispatch: Function, getState: Function) => {
+    let clinic: Object;
+    getState().clinics.clinicsNearBy.forEach((cl: any) => {
+      if (cl.id == clinicId) clinic = cl;
+    });
+
     dispatch(request(formData));
     waitlistService
       .joinWaitlist(getState().user.authToken, clinicId, formData)
@@ -61,7 +66,7 @@ const joinWaitlist = (clinicId: number, formData: JoinWaitlistFields) => {
           "waitlistActions: joined waitlist successfully: ",
           response
         );
-        dispatch(success({ clinicId, ...response }));
+        dispatch(success({ clinic, ...response }));
       })
       .catch(err => {
         console.log("waitlistActions: waitlist join error: ", err);

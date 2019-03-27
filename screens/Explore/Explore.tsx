@@ -67,7 +67,7 @@ class Explore extends React.Component<Props, State> {
     this.handleClinicFetch();
     setInterval(() => {
       this.handleClinicFetch();
-    }, 60000);
+    }, 5000);
   }
 
   static defaultProps = {

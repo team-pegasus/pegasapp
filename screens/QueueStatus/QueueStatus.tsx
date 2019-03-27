@@ -15,6 +15,7 @@ export interface Props {
   dispatch: Function;
   currWaitTime: any;
   clinic: any;
+  inQueue: boolean;
 }
 
 export interface State {}
@@ -40,8 +41,18 @@ class QueueStatus extends React.Component<Props, State> {
 
   componentDidMount() {
     this.props.dispatch(waitlistActions.getWaitTime());
+    setInterval(() => {
+      this.props.dispatch(waitlistActions.getWaitTime());
+    }, 5000);
   }
 
+  componentWillReceiveProps(props: Props) {
+    if (!props.inQueue) {
+      // if we're on this screen and we get prop that tells us we
+      // are not in queue, navigate to home screen
+      this.props.navigation.navigate("Explore");
+    }
+  }
   showAlert = () => {
     Alert.alert("Are you sure?", "You will forfeit your position in queue", [
       {
@@ -165,7 +176,8 @@ class QueueStatus extends React.Component<Props, State> {
 const mapStateToProps = (state: any) => {
   return {
     currWaitTime: state.waitlist.currWaitTime,
-    clinic: state.waitlist.clinic
+    clinic: state.waitlist.clinic,
+    inQueue: state.waitlist.inQueue
   };
 };
 

@@ -104,7 +104,7 @@ class ClinicDetail extends React.Component<Props> {
     if (etr && etr > 20 && etr < 40) {
       etrColour = "orange";
     } else if (etr && etr >= 40) {
-      etrColour = "red";
+      etrColour = "orange";
     }
 
     return (

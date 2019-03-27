@@ -98,6 +98,9 @@ const getWaitTime = () => {
         dispatch(success(response));
       })
       .catch(err => {
+        if (err.message === "User not in any present waitlists") {
+          dispatch(leaveWaitlist(getState().waitlist.clinic.id));
+        }
         console.log("waitlistActions: getWaitTime error: ", err);
         dispatch(failure(err.toString()));
       });

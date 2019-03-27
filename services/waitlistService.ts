@@ -39,6 +39,7 @@ const joinWaitlist = (
 
   return fetch(`${apiUrl}/waitlist/${clinicId}`, requestOptions)
     .then((response: any) => {
+      console.log("response from joinWaitlist: ", response);
       return response.json();
     })
     .then((data: JoinWaitlistResponse) => {
@@ -62,7 +63,7 @@ const getWaitTime = (authToken: string) => {
     })
     .then((data: GetWaitTimeResponse) => {
       console.log("getWaitTime response: ", data);
-      if (!data.wait) throw "getWaitTime request failed";
+      if (!data.wait) throw data;
       return data;
     });
 };

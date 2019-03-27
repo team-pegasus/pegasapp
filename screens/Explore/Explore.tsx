@@ -65,9 +65,6 @@ class Explore extends React.Component<Props, State> {
 
   componentDidMount() {
     this.handleClinicFetch();
-    setInterval(() => {
-      this.handleClinicFetch();
-    }, 5000);
   }
 
   static defaultProps = {
@@ -106,7 +103,7 @@ class Explore extends React.Component<Props, State> {
   };
 
   componentWillReceiveProps(props: Props) {
-    if (props.clinics.length) {
+    if (props.clinics.length && props.clinics[0] != this.props.clinics[0]) {
       this.handleMapCenter(
         props.clinics[0].latitude,
         props.clinics[0].longitude

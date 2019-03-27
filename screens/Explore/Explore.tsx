@@ -27,6 +27,9 @@ export interface Props {
 
 export interface State {
   selectedClinic: number;
+  searchDrivenQuery: boolean;
+  lastQuery: string;
+  lastAction: "" | "query" | "location";
 }
 
 const fallBackData = {
@@ -57,16 +60,27 @@ class Explore extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      selectedClinic: 0
+      selectedClinic: 0,
+      searchDrivenQuery: false,
+      lastAction: "",
+      lastQuery: ""
     };
 
     this.dayIndex = new Date().getDay();
+    this.handleClinicFetch();
   }
 
   componentDidMount() {
-    this.handleClinicFetch();
     setInterval(() => {
-      this.handleClinicFetch();
+      if (this.state.lastAction === "") {
+        this.handleClinicFetch();
+      } else if (this.state.lastAction === "location") {
+        this.currentLocationSearch();
+      } else if (this.state.lastAction === "query") {
+        this.props.dispatch(
+          clinicActions.fetchClinicsByAddress(this.state.lastQuery)
+        );
+      }
     }, 5000);
   }
 
@@ -89,7 +103,8 @@ class Explore extends React.Component<Props, State> {
     const lng = location.coords.longitude;
 
     this.props.dispatch(clinicActions.fetchClinicsByLatLong(lat, lng));
-    this.handleMapCenter(lat, lng);
+    if (this.state.lastAction != "location") this.handleMapCenter(lat, lng);
+    this.setState({ lastAction: "location", searchDrivenQuery: false });
   };
 
   currentLocationSearch = () => {
@@ -102,15 +117,21 @@ class Explore extends React.Component<Props, State> {
 
   handleSearch = (query: string) => {
     console.log("Explore: search submitted with query: ", query);
+    this.setState({
+      lastQuery: query,
+      lastAction: "query",
+      searchDrivenQuery: true
+    });
     this.props.dispatch(clinicActions.fetchClinicsByAddress(query));
   };
 
   componentWillReceiveProps(props: Props) {
-    if (props.clinics.length) {
+    if (props.clinics.length && this.state.searchDrivenQuery) {
       this.handleMapCenter(
         props.clinics[0].latitude,
         props.clinics[0].longitude
       );
+      this.setState({ searchDrivenQuery: false });
     }
   }
 
@@ -125,7 +146,6 @@ class Explore extends React.Component<Props, State> {
 
   navigateToQueueStatus = () => {
     this.props.navigation.navigate("QueueStatus", {
-      // title: this.props.navigation.state.params.title
       title: this.props.inQueueClinic.name
     });
   };
